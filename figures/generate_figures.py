@@ -111,7 +111,7 @@ def _downsample_grid(
     return m
 
 
-def write_heatmap_svg(path: str, max_display: int = 96) -> None:
+def write_heatmap_svg(path: str, max_display: int = 56) -> None:
     """
     Paper lift vs matched-density Bernoulli mask.
 
@@ -158,50 +158,66 @@ def write_heatmap_svg(path: str, max_display: int = 96) -> None:
             seed = (1103515245 * seed + 12345) % (2**31)
             rand[i][j] = 1.0 if (seed / 2**31) < p else 0.0
 
-    cell = max(3, min(8, 650 // (2 * disp + 16)))
-    gap = 12
-    bw = disp * cell + gap + disp * cell + 40
-    bh = disp * cell + 72
+    # Readable cell size in README / new-tab preview (tiny rects looked blank until zoomed)
+    cell = max(7, min(14, 720 // (2 * disp + 20)))
+    gap = 16
+    bw = disp * cell + gap + disp * cell + 48
+    bh = disp * cell + 88
 
-    parts = [_svg_header(bw, bh), '<rect width="100%" height="100%" fill="#eceff4"/>']
+    parts = [
+        _svg_header(bw, bh),
+        "<desc>Side-by-side occupancy: Bernoulli noise vs paper lift x+2y in S</desc>",
+        '<rect width="100%" height="100%" fill="#eceff4"/>',
+        '<g shape-rendering="crispEdges">',
+    ]
 
     def rect_color(v: float) -> str:
-        # Light grid background for empty; vivid red for occupied (readable on slide)
         if v <= 0.001:
             return "#d8dee9"
         return "#bf616a"
 
-    def draw_grid(
+    def draw_grid_rle(
         data: list[list[float]], ox: int, oy: int, title: str
     ) -> None:
+        """Horizontal run-length merge: fewer DOM nodes, faster GitHub/raw SVG view."""
         parts.append(
-            f'<text x="{ox + disp*cell//2}" y="{oy-10}" text-anchor="middle" '
-            f'fill="#2e3440" font-size="11">{title}</text>'
+            f'<text x="{ox + disp*cell//2}" y="{oy-12}" text-anchor="middle" '
+            f'fill="#2e3440" font-size="12">{title}</text>'
         )
+        ch = cell - 1
         for i in range(disp):
-            for j in range(disp):
-                c = rect_color(data[i][j])
+            row = data[i]
+            j = 0
+            while j < disp:
+                v = row[j]
+                k = j + 1
+                while k < disp and row[k] == v:
+                    k += 1
+                w = (k - j) * cell - 1
+                c = rect_color(v)
                 parts.append(
-                    f'<rect x="{ox+j*cell}" y="{oy+i*cell}" width="{cell-1}" '
-                    f'height="{cell-1}" fill="{c}" stroke="#c5cddb" stroke-width="0.3"/>'
+                    f'<rect x="{ox+j*cell}" y="{oy+i*cell}" width="{w}" height="{ch}" '
+                    f'fill="{c}" stroke="#b9c3d6" stroke-width="0.25"/>'
                 )
+                j = k
 
     sub = f"display {disp}x{disp}" if disp < n_full else f"{n_full}x{n_full}"
-    draw_grid(
+    draw_grid_rle(
         rand,
-        20,
-        48,
+        24,
+        56,
         f"random Bernoulli(p), p={p:.4f} (same density as right)",
     )
-    draw_grid(
+    draw_grid_rle(
         m_lift,
-        20 + disp * cell + gap,
-        48,
+        24 + disp * cell + gap,
+        56,
         f"paper lift (|A|={len(lift)}, |S|={len(s1)}, grid n={n_full}; {sub})",
     )
+    parts.append("</g>")
     parts.append(
-        f'<text x="{bw//2}" y="{bh-14}" text-anchor="middle" fill="#4c566a" font-size="11">'
-        "Heatmaps — lines x+2y=const visible when n is large enough to reach all of S</text>"
+        f'<text x="{bw//2}" y="{bh-18}" text-anchor="middle" fill="#4c566a" font-size="11">'
+        "Heatmaps — diagonal stripes: structured lift vs noise (open raw SVG if preview is small)</text>"
     )
     parts.append("</svg>")
     with open(path, "w", encoding="utf-8") as f:
