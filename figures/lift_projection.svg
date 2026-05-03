@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="260" viewBox="0 0 720 260" font-family="system-ui,sans-serif">
+<rect width="100%" height="100%" fill="#fffef8"/>
+<text x="360" y="28" text-anchor="middle" font-size="15" fill="#222">Lift L(x,y) = x + 2y: a corner in A forces z, z+d, z+2d in S</text>
+<text x="40" y="95" font-size="13" fill="#444">1D (values in S)</text>
+<line x1="120" y1="110" x2="520" y2="110" stroke="#333" stroke-width="2"/>
+<circle cx="180" cy="110" r="10" fill="#1a5276"/>
+<text x="180" y="115" text-anchor="middle" fill="white" font-size="12">z</text>
+<circle cx="300" cy="110" r="10" fill="#1a5276"/>
+<text x="300" y="115" text-anchor="middle" fill="white" font-size="12">z+d</text>
+<circle cx="420" cy="110" r="10" fill="#1a5276"/>
+<text x="420" y="115" text-anchor="middle" fill="white" font-size="12">z+2d</text>
+<text x="40" y="195" font-size="13" fill="#444">2D corner in A</text>
+<rect x="480" y="150" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="516" y="150" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="552" y="150" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="588" y="150" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="480" y="186" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="516" y="186" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="552" y="186" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="588" y="186" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="480" y="222" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="516" y="222" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="552" y="222" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="588" y="222" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="480" y="258" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="516" y="258" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="552" y="258" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="588" y="258" width="35" height="35" fill="#f5f5f5" stroke="#ccc"/>
+<rect x="480" y="150" width="35" height="35" fill="#c0392b" stroke="#922b21"/>
+<rect x="516" y="150" width="35" height="35" fill="#c0392b" stroke="#922b21"/>
+<rect x="480" y="186" width="35" height="35" fill="#c0392b" stroke="#922b21"/>
+<text x="552" y="310" font-size="11" fill="#555">(x,y), (x+d,y), (x,y+d)</text>
+</svg>
