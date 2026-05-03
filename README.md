@@ -6,6 +6,7 @@
 |---------|------|
 | [Overview](#overview) | Problem, lift, and outputs |
 | [Quick start](#quick-start) | Commands: CLI, tests, figures |
+| [Verify locally](#verify-locally) | Tests, figures, compliance smoke |
 | [Research extensions](#research-extensions-benchmark-style) | Skew search + **constructions**, shell profile, **grid_norm** pipe, $S_n$ demo |
 | [Docs (math + schema)](#supplementary-documents) | Skew-free lemmas, `grid_norm_pipe_v1` spec |
 | [Capstone](#capstone-validation-loop-quantitative-arc-diagonal-drop) | Compliance loop, saving arc, diagonal drop |
@@ -66,7 +67,26 @@ python scripts/paper_compliance_loop.py --target-alpha 0.02 --write-dir reports/
 
 **Useful flags:** `--d`, `--k`, `--S`, `--grid-n`, `--dense-shell` (paper mode: max shell even if 3-AP), `--list`, `--demo`. Research: `--skew-check`, `--profile-shells-csv`, `--profile-shells-svg`, `--export-json`, `--export-csv`, `--export-grid-norm-json`, `--export-grid-norm-csv`, `--symmetric-lift-json`, `--symmetric-n`, `--skew-free` / `--skew-free-m` / `--skew-free-seed`.
 
+**Compliance loop flags:** `--write-dir` (default `reports/compliance_output`), `--no-search`, `--detector-cmd`, `--max-d`, `--max-k`, `--max-universe` (caps the digit universe $d^k$ during density search for speed). Output under `reports/` is **gitignored**—commit only if you copy artifacts elsewhere.
+
 **Math in this file:** GitHub renders `$...$` and `$$...$$` ([docs](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)). In **tables**, use `\lvert`/`\rvert` instead of raw `|` in formulas.
+
+---
+
+## Verify locally
+
+Before pushing or presenting, run:
+
+```bash
+python -m unittest discover -s tests -p "test_*.py" -v
+python figures/generate_figures.py
+python behrend_corner_free.py --mode paper --d 5 --k 3 --S 4 --grid-n 15 --skew-check
+```
+
+Optional (writes under `reports/`, ignored by git): a **short** compliance sweep, e.g.  
+`python scripts/paper_compliance_loop.py --target-alpha 0.05 --max-d 8 --max-k 4 --max-universe 12000 --write-dir reports/smoke`.
+
+**Remote:** default branch is **`main`** on [`ab0626/Behrend-Construction-for-corner-free-sets`](https://github.com/ab0626/Behrend-Construction-for-corner-free-sets); after local edits, `git push origin main`.
 
 ---
 
@@ -110,6 +130,7 @@ python scripts/paper_compliance_loop.py --target-alpha 0.05
 python scripts/paper_compliance_loop.py --target-alpha 0.025 --write-dir reports/demo
 python scripts/paper_compliance_loop.py --no-search --d 7 --k 5 --write-dir reports/fixed \\
     --detector-cmd "python path/to/grid_norm_cli.py --input {json_path}"
+# Faster search (smaller (d,k) sweep): e.g. --max-d 8 --max-k 4 --max-universe 12000
 ```
 
 If your detector reports **structured** behavior on the Behrend lift while `has_corner_in_grid` stays false in your checker, you have aligned **lower-bound geometry** with **upper-bound–style uniformity detection** on the same exported grid—exactly the ecosystem the two repos are meant to stress-test.
