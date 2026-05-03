@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="320" viewBox="0 0 820 320" font-family="system-ui,sans-serif">
+<rect width="100%" height="100%" fill="#fafafa"/>
+<text x="410" y="22" text-anchor="middle" font-size="14" fill="#222">Shell density |{x : Σ x_i² = S}| vs S (d=5, k=4)</text>
+<rect x="50.00" y="257.33" width="10.98" height="7.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="61.38" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="72.77" y="219.00" width="10.98" height="46.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="84.15" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="95.54" y="226.67" width="10.98" height="38.33" fill="#5e81ac" opacity="0.85"/>
+<rect x="106.92" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="118.31" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="129.69" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="141.08" y="219.00" width="10.98" height="46.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="152.46" y="142.33" width="10.98" height="122.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="163.85" y="127.00" width="10.98" height="138.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="175.23" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="186.62" y="203.67" width="10.98" height="61.33" fill="#5e81ac" opacity="0.85"/>
+<rect x="198.00" y="142.33" width="10.98" height="122.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="209.38" y="81.00" width="10.98" height="184.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="220.77" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="232.15" y="226.67" width="10.98" height="38.33" fill="#5e81ac" opacity="0.85"/>
+<rect x="243.54" y="81.00" width="10.98" height="184.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="254.92" y="35.00" width="10.98" height="230.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="266.31" y="142.33" width="10.98" height="122.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="277.69" y="127.00" width="10.98" height="138.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="289.08" y="50.33" width="10.98" height="214.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="300.46" y="81.00" width="10.98" height="184.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="311.85" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="323.23" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="334.62" y="81.00" width="10.98" height="184.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="346.00" y="35.00" width="10.98" height="230.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="357.38" y="142.33" width="10.98" height="122.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="368.77" y="203.67" width="10.98" height="61.33" fill="#5e81ac" opacity="0.85"/>
+<rect x="380.15" y="81.00" width="10.98" height="184.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="391.54" y="81.00" width="10.98" height="184.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="402.92" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="414.31" y="219.00" width="10.98" height="46.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="425.69" y="81.00" width="10.98" height="184.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="437.08" y="127.00" width="10.98" height="138.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="448.46" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="459.85" y="165.33" width="10.98" height="99.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="471.23" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="482.62" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="505.38" y="219.00" width="10.98" height="46.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="516.77" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="528.15" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="539.54" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="562.31" y="173.00" width="10.98" height="92.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="596.46" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="607.85" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="619.23" y="219.00" width="10.98" height="46.00" fill="#5e81ac" opacity="0.85"/>
+<rect x="642.00" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="698.92" y="234.33" width="10.98" height="30.67" fill="#5e81ac" opacity="0.85"/>
+<rect x="778.62" y="257.33" width="10.98" height="7.67" fill="#5e81ac" opacity="0.85"/>
+<text x="50" y="302" font-size="11" fill="#555">S (sum of squared digits)</text>
+<text x="410" y="312" text-anchor="middle" font-size="10" fill="#888">max count per shell = 30</text>
+</svg>

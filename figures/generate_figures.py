@@ -301,6 +301,13 @@ def write_nof_sketch_svg(path: str) -> None:
         f.write("\n".join(lines))
 
 
+def write_shell_profile_svg(path: str) -> None:
+    """Shell-density histogram (small d,k for speed)."""
+    import research_extensions as rex
+
+    rex.write_shell_density_svg(path, d=5, k=4, max_x=5**4 - 1)
+
+
 def main() -> None:
     out_dir = os.path.dirname(os.path.abspath(__file__))
     paths = [
@@ -308,6 +315,7 @@ def main() -> None:
         ("heatmap_lift_vs_random.svg", write_heatmap_svg),
         ("lift_projection.svg", write_lift_projection_svg),
         ("nof_sketch.svg", write_nof_sketch_svg),
+        ("shell_density_profile.svg", write_shell_profile_svg),
     ]
     for name, fn in paths:
         p = os.path.join(out_dir, name)

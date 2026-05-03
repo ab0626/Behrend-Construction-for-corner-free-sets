@@ -377,7 +377,63 @@ def main() -> None:
     )
     p.add_argument("--list", action="store_true", help="print all grid points")
     p.add_argument("--demo", action="store_true", help="run small built-in examples after CLI output")
+    p.add_argument(
+        "--skew-check",
+        action="store_true",
+        help="also search for skew corners (x,y),(x+d,y),(x,y+d') with d≠d'",
+    )
+    p.add_argument(
+        "--profile-shells-csv",
+        metavar="PATH",
+        default=None,
+        help="write shell density table CSV (sum_sq, count, density) for --d/--k; then exit",
+    )
+    p.add_argument(
+        "--profile-shells-svg",
+        metavar="PATH",
+        default=None,
+        help="write shell density bar chart SVG for --d/--k; then exit",
+    )
+    p.add_argument(
+        "--export-csv",
+        metavar="PATH",
+        default=None,
+        help="export grid points as sparse CSV (x,y)",
+    )
+    p.add_argument(
+        "--export-json",
+        metavar="PATH",
+        default=None,
+        help="export run metadata + grid points as JSON (for external norm tools)",
+    )
+    p.add_argument(
+        "--symmetric-lift-json",
+        metavar="PATH",
+        default=None,
+        help="export 1D shell values as cyclic permutations in S_n (see --symmetric-n)",
+    )
+    p.add_argument(
+        "--symmetric-n",
+        type=int,
+        default=6,
+        help="degree n for S_n cyclic lift (default 6)",
+    )
     args = p.parse_args()
+
+    if args.profile_shells_csv:
+        import research_extensions as rex
+
+        rex.write_shell_profile_csv(args.profile_shells_csv, args.d, args.k)
+        print(f"Wrote shell profile: {args.profile_shells_csv}")
+        return
+    if args.profile_shells_svg:
+        import research_extensions as rex
+
+        rex.write_shell_density_svg(
+            args.profile_shells_svg, args.d, args.k, max_x=args.d**args.k - 1
+        )
+        print(f"Wrote shell density SVG: {args.profile_shells_svg}")
+        return
 
     max_x = args.d**args.k - 1
     grid_n: Optional[int] = args.grid_n
@@ -413,6 +469,17 @@ def main() -> None:
             print(f"CORNER in A: A={A}, B={B}, C={Cc}, d={dval}")
         else:
             print("No axis-aligned L-corner in A.")
+        if args.skew_check:
+            import research_extensions as rex
+
+            sk = rex.find_skew_corner(set(pl.points))
+            if sk:
+                p1, p2, p3, d0, dp = sk
+                print(
+                    f"SKEW corner: {p1}, {p2}, {p3} with d={d0}, d'={dp} (d≠d')"
+                )
+            else:
+                print("No skew corner (d≠d') in A.")
         pts = pl.points
     else:
         bg = build_behrend_grid_set(args.d, args.k, args.k1, sum_sq, max_x=max_x)
@@ -424,7 +491,70 @@ def main() -> None:
             print(f"CORNER: A={A}, B={B}, C={Cc}, d={dval}")
         else:
             print("No axis-aligned L-corner in this digit-split set.")
+        if args.skew_check:
+            import research_extensions as rex
+
+            sk = rex.find_skew_corner(set(bg.points))
+            if sk:
+                p1, p2, p3, d0, dp = sk
+                print(
+                    f"SKEW corner: {p1}, {p2}, {p3} with d={d0}, d'={dp} (d≠d')"
+                )
+            else:
+                print("No skew corner (d≠d') in A.")
         pts = bg.points
+
+    if args.symmetric_lift_json:
+        import research_extensions as rex
+
+        if args.mode == "paper":
+            s_sorted = sorted(pl.one_d_set)
+        else:
+            s_sorted = sorted(bg.raw_x_values)
+        rex.lift_shell_to_symmetric_group_json(
+            s_sorted,
+            max(2, args.symmetric_n),
+            args.symmetric_lift_json,
+            extra={"d": args.d, "k": args.k, "sum_sq": sum_sq},
+        )
+        print(f"Wrote S_n cyclic lift: {args.symmetric_lift_json}")
+
+    if args.export_csv:
+        import research_extensions as rex
+
+        meta = {
+            "d": args.d,
+            "k": args.k,
+            "mode": args.mode,
+            "sum_sq": sum_sq,
+            "grid_n": pl.grid_n if args.mode == "paper" else None,
+        }
+        rex.export_sparse_grid_csv(pts, args.export_csv, meta=meta)
+        print(f"Wrote grid CSV: {args.export_csv}")
+
+    if args.export_json:
+        import research_extensions as rex
+
+        one_d = (
+            sorted(pl.one_d_set)
+            if args.mode == "paper"
+            else sorted(frozenset(bg.raw_x_values))
+        )
+        pn = pl.grid_n if args.mode == "paper" else None
+        rex.export_run_json(
+            args.export_json,
+            mode=args.mode,
+            params={
+                "d": args.d,
+                "k": args.k,
+                "sum_sq": sum_sq,
+                "grid_n": pn,
+                "k1": args.k1 if args.mode == "digit-split" else None,
+            },
+            points=pts,
+            one_d_sorted=one_d,
+        )
+        print(f"Wrote JSON: {args.export_json}")
 
     if args.list:
         for pt in sorted(pts):
