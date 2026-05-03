@@ -13,7 +13,7 @@
 | [Capstone](#capstone-validation-loop-quantitative-arc-diagonal-drop) | Compliance loop, saving arc, diagonal drop |
 | [Gallery & proofs](#visual-gallery-inline) | Figures, where formal proofs live |
 | [Alignment with the paper](#alignment-with-the-paper-jaber-et-al-2025) | Curvature, sifting, Behrend regime, NOF |
-| [§1–4](#1-geometry-of-the-lift-projection-equivalence) | Lift, density, NOF, heatmaps |
+| [Secs. 1–4](#1-geometry-of-the-lift-projection-equivalence) | Lift, density, NOF, heatmaps |
 | [Files](#file-map) | Repo layout |
 
 ---
@@ -60,7 +60,7 @@ python behrend_corner_free.py --skew-free greedy --skew-free-m 20 --export-grid-
 python behrend_corner_free.py --mode paper --d 5 --k 4 --S 8 --grid-n 30 \
   --export-grid-norm-json behrend_as_grid_norm.json
 
-# Paper compliance loop: lift near target α → grid_norm JSON → optional detector → report
+# Paper compliance loop: lift near target density alpha -> grid_norm JSON -> optional detector -> report
 # (default output: reports/compliance_output/; override with --write-dir)
 python scripts/paper_compliance_loop.py --target-alpha 0.05
 python scripts/paper_compliance_loop.py --target-alpha 0.02 --write-dir reports/demo1
@@ -70,7 +70,7 @@ python scripts/paper_compliance_loop.py --target-alpha 0.02 --write-dir reports/
 
 **Compliance loop flags:** `--write-dir` (default `reports/compliance_output`), `--no-search`, `--detector-cmd`, `--max-d`, `--max-k`, `--max-universe` (caps the digit universe $d^k$ during density search for speed). Output under `reports/` is **gitignored**—commit only if you copy artifacts elsewhere.
 
-**Math in this file:** GitHub renders `$...$` and `$$...$$` ([docs](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)). In **tables**, use `\lvert`/`\rvert` instead of raw `|` in formulas.
+**Math in this file:** GitHub renders `$...$` and `$$...$$` ([docs](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)). Use `\lvert`/`\rvert` for cardinalities and `\lVert`/`\rVert` for norms (avoid raw `|` inside formulas, especially in **tables**). Section references use **Sec.** to keep table pipes unambiguous.
 
 ---
 
@@ -97,10 +97,10 @@ These bridge **lower-bound-style constructions** (Behrend shell + lift) toward *
 
 | Feature | CLI / module | Paper tie-in | Notes |
 |---------|----------------|--------------|--------|
-| **Skew corners** | `--skew-check`; `find_skew_corner`, `is_skew_corner_free` | §2.2-style $(x,y),(x+d,y),(x,y+d')$ with $d\neq d'$ | **Search** on any set. **Constructions:** `--skew-free permutation` (graph of $\pi$; also **axis**-corner-free) or `--skew-free greedy` (maximal under random order; may have axis corners). See [docs/skew_corner_free_constructions.md](docs/skew_corner_free_constructions.md). |
-| **Shell density profiling** | `--profile-shells-csv PATH`, `--profile-shells-svg PATH`; `figures/shell_density_profile.svg` from `generate_figures.py` | Density increments / where shells **cluster** | CSV/SVG: population of $\{x:\sum_i x_i^2=S\}$ vs $S$. |
-| **Non-abelian demo lift** | `--symmetric-lift-json PATH` (+ `--symmetric-n`) | §1.1 **Fox-style** reductions in the paper; not reimplemented | Cyclic permutation in $S_n$ per shell value. Illustrative only. |
-| **Norm-pipe (legacy)** | `--export-json`, `--export-csv` | §2.3-style **grid norm** programs | Format id `behrend_corner_free_grid_v1`; sparse $(x,y)$ + params. |
+| **Skew corners** | `--skew-check`; `find_skew_corner`, `is_skew_corner_free` | Sec. 2.2-style $(x,y),\ (x+d,y),\ (x,y+d')$ with $d\neq d'$ | **Search** on any set. **Constructions:** `--skew-free permutation` (graph of $\pi$; also **axis**-corner-free) or `--skew-free greedy` (maximal under random order; may have axis corners). See [docs/skew_corner_free_constructions.md](docs/skew_corner_free_constructions.md). |
+| **Shell density profiling** | `--profile-shells-csv PATH`, `--profile-shells-svg PATH`; `figures/shell_density_profile.svg` from `generate_figures.py` | Density increments / where shells **cluster** | CSV/SVG: population of $\{x : \sum_i x_i^2 = S\}$ vs.~$S$. |
+| **Non-abelian demo lift** | `--symmetric-lift-json PATH` (+ `--symmetric-n`) | Sec. 1.1 **Fox-style** reductions in the paper; not reimplemented | Cyclic permutation in $S_n$ per shell value. Illustrative only. |
+| **Norm-pipe (legacy)** | `--export-json`, `--export-csv` | Sec. 2.3-style **grid norm** programs | Format id `behrend_corner_free_grid_v1`; sparse $(x,y)$ + params. |
 | **Norm-pipe (detector)** | `--export-grid-norm-json`, `--export-grid-norm-csv` | Same detection narrative | Format **`grid_norm_pipe_v1`**: bounding box, `packed_xy`, coordinate conventions—see [docs/grid_norm_pipe_schema.md](docs/grid_norm_pipe_schema.md). |
 
 ---
@@ -111,10 +111,10 @@ These bridge **lower-bound-style constructions** (Behrend shell + lift) toward *
 |----------|---------|
 | [docs/skew_corner_free_constructions.md](docs/skew_corner_free_constructions.md) | Definitions, lemmas (permutation graph), greedy caveats, CLI |
 | [docs/grid_norm_pipe_schema.md](docs/grid_norm_pipe_schema.md) | Full **`grid_norm_pipe_v1`** JSON/CSV field reference for tooling |
-| [docs/diagonal_drop.md](docs/diagonal_drop.md) | §7.1-style **diagonal vs coordinate** narrative (for Grid Norm / Exactly-$N$ repos) |
+| [docs/diagonal_drop.md](docs/diagonal_drop.md) | Sec. 7.1-style **diagonal vs coordinate** narrative (for Grid Norm / Exactly-$N$ repos) |
 | [docs/failure_mode_random_vs_behrend.md](docs/failure_mode_random_vs_behrend.md) | **Negative control:** random vs Behrend at matched $\alpha$; Von Neumann / norm contrast |
 | [docs/grid_norm_k_sensitivity.md](docs/grid_norm_k_sensitivity.md) | **$(2,k)$-norm:** $k$ too small $\Rightarrow$ no signal; too large $\Rightarrow$ variance; heuristic $k \sim \log(1/\alpha)$ |
-| [docs/future_work_3d_corners.md](docs/future_work_3d_corners.md) | **§1.3-style** 3D corners $\leftrightarrow$ 4-party NOF (conceptual; not in code) |
+| [docs/future_work_3d_corners.md](docs/future_work_3d_corners.md) | **Sec. 1.3-style** 3D corners $\leftrightarrow$ 4-party NOF (conceptual; not in code) |
 
 ---
 
@@ -132,15 +132,15 @@ The paper’s uniformity layer is **sensitive** to the multilinearity degree $k$
 
 ### 3. 3D corners and higher-party NOF (future work)
 
-**[`docs/future_work_3d_corners.md`](docs/future_work_3d_corners.md)** records the **3D corner** pattern $(x,y,z),(x+d,y,z),(x,y+d,z),(x,y,z+d)$ and its **conceptual** link to **4-player NOF**, per the paper’s **§1.3** thread—while this repo stays **2D**-first.
+**[`docs/future_work_3d_corners.md`](docs/future_work_3d_corners.md)** records the **3D corner** pattern $(x,y,z),\ (x+d,y,z),\ (x,y+d,z),\ (x,y,z+d)$ and its **conceptual** link to **4-player NOF**, per the paper’s **Sec. 1.3** thread—while this repo stays **2D**-first.
 
 ### Ecosystem map (lifecycle of the corners theorem)
 
 | Module (your lab) | Role | Paper anchor (verify in your PDF) |
 |-------------------|------|-------------------------------------|
-| **Behrend generator** (this repo) | Constructive **lower bound** / lift | §2.1-style inputs; projection $x+2y$ |
+| **Behrend generator** (this repo) | Constructive **lower bound** / lift | Sec. 2.1-style inputs; projection $x+2y$ |
 | **Grid norm pipe** + detector | **Structural detection** / uniformity | Grid-type lemmas (e.g. **Lemma 5.11** area—check edition) |
-| **Bohr / regularity** tooling (elsewhere) | **Geometric maintenance** of structured pieces | §6 / Definition 6.3 style |
+| **Bohr / regularity** tooling (elsewhere) | **Geometric maintenance** of structured pieces | Sec. 6 / Definition 6.3 style |
 | **Exactly-$N$** application (elsewhere) | **Communication** / complexity | Corollary 1.7 style |
 
 ---
@@ -151,7 +151,7 @@ The paper’s uniformity layer is **sensitive** to the multilinearity degree $k$
 
 Script **[`scripts/paper_compliance_loop.py`](scripts/paper_compliance_loop.py)** ties together:
 
-1. **Behrend paper lift** — search an AP-free shell whose $|A|/n^2$ is closest to a **target density** $\alpha$ (`search_ap_free_lift_near_density` in [`research_extensions.py`](research_extensions.py)), or pass **`--no-search --d --k`** for fixed parameters.
+1. **Behrend paper lift** — search an AP-free shell whose $\lvert A\rvert/n^2$ is closest to a **target density** $\alpha$ (`search_ap_free_lift_near_density` in [`research_extensions.py`](research_extensions.py)), or pass **`--no-search --d --k`** for fixed parameters.
 2. **Grid Norm pipe** — writes `grid_norm_pipe_export.json` (`grid_norm_pipe_v1`) into your output directory.
 3. **External detector (optional)** — `--detector-cmd 'your_tool --json {json_path}'` forwards that file to your **Grid Norm / clumpiness** CLI; stdout is JSON-parsed when possible.
 4. **Paper Compliance Report** — `paper_compliance_report.md` + `.json` with axis-corner check, AP-in-shell check, and an informal **row clumpiness proxy** (max/mean occupancy per $y$).
@@ -173,14 +173,14 @@ The schematic **[`figures/quantitative_saving_arc.svg`](figures/quantitative_sav
 | Curve | Stylized meaning |
 |-------|------------------|
 | **Shkredov-type** | $\sim 1/\log\log N$ weakness (normalized for plot) |
-| **Jaber et al. (2025)** | $\exp(-(\log N)^{c})$-type **quasipolynomial** regime |
-| **Behrend** | $\exp(-\Theta(\sqrt{\log N}))$ lower-bound benchmark |
+| **Jaber et al. (2025)** | $\exp\bigl(-(\log N)^{c}\bigr)$-type **quasipolynomial** regime |
+| **Behrend** | $\exp\bigl(-\Theta(\sqrt{\log N})\bigr)$ lower-bound benchmark |
 
 The caption stresses **min–max normalization for readability**, not a single theorem’s constants. It is the “money shot” for showing **narrowing** between classical constructions and modern upper bounds (also inlined in the [gallery](#visual-gallery-inline)).
 
-### 3. Diagonal drop (paper §7.1)
+### 3. Diagonal drop (paper Sec. 7.1)
 
-**[`docs/diagonal_drop.md`](docs/diagonal_drop.md)** explains why treating the **diagonal direction $D$** separately from **$X$** and **$Y$** avoids tower-type losses—so your **protocol / Bohr-dimension** slides can cite **Definition 6.3** and §7.1 with the same language as the paper. Copy or link this section into your **Grid Norm** or **Exactly-$N$** repo README if those tools rely on asymmetric density.
+**[`docs/diagonal_drop.md`](docs/diagonal_drop.md)** explains why treating the **diagonal direction $D$** separately from **$X$** and **$Y$** avoids tower-type losses—so your **protocol / Bohr-dimension** slides can cite **Definition 6.3** and Sec. 7.1 with the same language as the paper. Copy or link this section into your **Grid Norm** or **Exactly-$N$** repo README if those tools rely on asymmetric density.
 
 ---
 
@@ -216,7 +216,13 @@ Regenerate: `python figures/generate_figures.py` (writes **seven** SVGs: density
 
 ## Alignment with the paper (Jaber et al., 2025)
 
-Primary reference: **Michael Jaber, Yang P. Liu, Shachar Lovett, Anthony Ostuni, Mehtaab Sawhney**, *Quasipolynomial bounds for the corners theorem*, [arXiv:2504.07006](https://arxiv.org/abs/2504.07006). That work proves (for corner-free $A \subseteq G \times G$) an upper bound of the form $|A| \le |G|^2 \exp(-(\log|G|)^{\Omega(1)})$, and derives communication consequences in the **3-player Number-on-Forehead** model. This repository does **not** reimplement those proofs; it is a **hands-on companion** for Behrend-type **inputs** and the **$x+2y$** lift.
+Primary reference: **Michael Jaber, Yang P. Liu, Shachar Lovett, Anthony Ostuni, Mehtaab Sawhney**, *Quasipolynomial bounds for the corners theorem*, [arXiv:2504.07006](https://arxiv.org/abs/2504.07006). That work proves (for corner-free $A \subseteq G \times G$) an upper bound of the form
+
+$$
+\lvert A\rvert \le \lvert G\rvert^2 \exp\bigl(-(\log \lvert G\rvert)^{\Omega(1)}\bigr),
+$$
+
+and derives communication consequences in the **3-player Number-on-Forehead** model. This repository does **not** reimplement those proofs; it is a **hands-on companion** for Behrend-type **inputs** and the **$x+2y$** lift.
 
 ### 1. Curvature, sphere shells, and 3-AP freeness
 
@@ -224,7 +230,7 @@ Behrend’s idea is to place digits on a **high-dimensional sphere** (fixed $\su
 
 ### 2. Relative sifting and “sparse but structured”
 
-A recurring theme in modern arguments is **relative** or **sparse** analysis: extracting structure **inside** a **sparse** set or majorant. Your lifted set $A=\{(x,y):x+2y\in S\}$ is **sparse** in $[n]^2$, yet it is **highly structured**—mass lies on **lines** $x+2y=t$. That is the **anisotropic clumpiness** the heatmap is meant to suggest: a **pseudorandom** set has **small** multilinear uniformity (order-2 **grid / box** control), while a **structured** lift produces **large** multilinear biases—exactly the kind of **signal** a **density increment** or **sifting** step must detect in a corner-free **upper-bound** proof. (The README still does **not** compute norms numerically; it only **visualizes** support.)
+A recurring theme in modern arguments is **relative** or **sparse** analysis: extracting structure **inside** a **sparse** set or majorant. Your lifted set $A = \{(x,y) : x+2y \in S\}$ is **sparse** in $[n]^2$, yet it is **highly structured**—mass lies on **lines** $x+2y = t$. That is the **anisotropic clumpiness** the heatmap is meant to suggest: a **pseudorandom** set has **small** multilinear uniformity (order-2 **grid / box** control), while a **structured** lift produces **large** multilinear biases—exactly the kind of **signal** a **density increment** or **sifting** step must detect in a corner-free **upper-bound** proof. (The README still does **not** compute norms numerically; it only **visualizes** support.)
 
 ### 3. The Behrend regime vs older density losses
 
@@ -244,10 +250,10 @@ The paper explains how strong **corner-free-set** bounds imply **polynomial-leng
 
 The paper uses the fact that an **axis corner** in 2D forces a **3-term arithmetic progression** in 1D under the map $L(x,y)=x+2y$.
 
-If $(x,y), (x+d,y), (x,y+d) \in A$ and $z=x+2y$, then
+If $(x,y),\ (x+d,y),\ (x,y+d) \in A$ and $z = x+2y$, then
 
 $$
-z,\quad (x+d)+2y = z+d,\quad x+2(y+d)=z+2d \in S.
+z,\quad (x+d)+2y = z+d,\quad x+2(y+d) = z+2d \in S.
 $$
 
 So a corner in $A$ $\Rightarrow$ a 3-AP in $S$. The **inverse** direction (start from 3-AP-free $S$, define $A$ by $x+2y\in S$) is what this repository implements.
@@ -292,7 +298,7 @@ The manuscript emphasizes moving from very weak **doubly logarithmic** decay tow
 |--------|------|
 | $1/\log\log N$ (normalized) | “old-scale” proxy — nearly flat for large $N$ |
 | $\exp(-(\log N)^{1/2})$ (normalized) | stylized “new-scale” decay |
-| **Empirical** $\lvert S\rvert/d^k$ | from `best_S_ap_free_max_count` + `build_behrend_sphere_slice` at $N=d^k$ |
+| **Empirical** $\lvert S\rvert/d^k$ | from `best_S_ap_free_max_count` + `build_behrend_sphere_slice` at $N = d^k$ |
 
 ![Density: stylized bounds vs shell fraction](figures/density_comparison.svg)
 
@@ -329,9 +335,9 @@ If your **Project 1** code uses a Number-on-Forehead (NOF) model (players see al
 | Panel | Content |
 |--------|---------|
 | Left | random Bernoulli mask with $p \approx \lvert A\rvert/n^2$ |
-| Right | paper lift $A=\{(x,y): x+2y\in S\}$ |
+| Right | paper lift $A = \{(x,y) : x+2y \in S\}$ |
 
-**Implementation (heatmap):** `figures/generate_figures.py` picks an AP-free shell for $(d,k)=(7,4)$ (fallback $(5,4)$), sets **grid size** $n_{\mathrm{full}} = \texttt{default\_grid\_n\_for\_lift}(S)$ so $\max(x+2y)=3n_{\mathrm{full}}$ can reach $\max(S)$—required so the lift is **non-empty**. It draws a **downsampled** grid (default **56×56** bins) with **run-length merged** SVG rects (readable tile size, ~hundreds of DOM nodes). *Never* cap $n$ below $n_{\mathrm{full}}$ when interpreting $\{(x,y):x+2y\in S\}$, or the lift collapses to **empty** ($p=0$). GitHub’s README preview may **shrink** the SVG; use **Open raw** on the file for full width.
+**Implementation (heatmap):** `figures/generate_figures.py` picks an AP-free shell for $(d,k) = (7,4)$ (fallback $(5,4)$), sets **grid size** $n_{\mathrm{full}} = \texttt{default\_grid\_n\_for\_lift}(S)$ so $\max_{x,y \in [n]}(x+2y) = 3n_{\mathrm{full}}$ can reach $\max(S)$—required so the lift is **non-empty**. It draws a **downsampled** grid (default **56×56** bins) with **run-length merged** SVG rects (readable tile size, ~hundreds of DOM nodes). *Never* cap $n$ below $n_{\mathrm{full}}$ when interpreting $\{(x,y) : x+2y \in S\}$, or the lift collapses to **empty** ($p=0$). GitHub’s README preview may **shrink** the SVG; use **Open raw** on the file for full width.
 
 ![Random mask vs paper lift occupancy](figures/heatmap_lift_vs_random.svg)
 
@@ -339,9 +345,9 @@ If your **Project 1** code uses a Number-on-Forehead (NOF) model (players see al
 
 The manuscript’s **Gowers-type grid norms** (e.g. $(2,k)$-grid / box-type uniformity) are designed to detect **multilinear structure** in a set $A \subseteq [n]^2$. Your figure is only a **pixel picture** of support, but it matches the *direction* of that theory:
 
-- **Left (random):** Let $\alpha = |A|/n^2$ and consider the balanced indicator $f = \mathbf{1}_A - \alpha$. For a genuinely random (Bernoulli) set at density $\alpha$, **local averages along rectangles and along lines fluctuate like noise**—there is no organized “clumpiness” for a **density increment** step to lock onto. In a cartoon of **order-2 grid / box control**, one expects $\|f\|_{\mathrm{grid}}$ to stay **small** (on the order of $\alpha^2$ in a coarse heuristic).
+- **Left (random):** Let $\alpha = \lvert A\rvert/n^2$ and consider the balanced indicator $f = \mathbf{1}_A - \alpha$. For a genuinely random (Bernoulli) set at density $\alpha$, **local averages along rectangles and along lines fluctuate like noise**—there is no organized “clumpiness” for a **density increment** step to lock onto. In a cartoon of **order-2 grid / box control**, one expects $\lVert f\rVert_{\mathrm{grid}}$ to stay **small** (on the order of $\alpha^2$ in a coarse heuristic).
 
-- **Right (paper lift):** Membership is $(x,y) \in A \iff x+2y \in S$. Every point lies on one of the **affine lines** $x+2y = t$. Even when $S$ is sparse in $\mathbb{Z}$, the lift **concentrates** $A$ on a **family of parallel lines in the plane**—visible as **stripes / ridges** in the heatmap. That **anisotropic alignment** is exactly the kind of **non-pseudorandom** pattern a **grid norm** is meant to **amplify**: heuristically $\|f\|_{\mathrm{grid}}$ is **large** (well above the $\alpha^2$ “random baseline”), signaling **hidden linear structure** compatible with the proof’s **relative sifting** / **density increment** engine (see [arXiv:2504.07006](https://arxiv.org/abs/2504.07006)).
+- **Right (paper lift):** Membership is $(x,y) \in A \iff x+2y \in S$. Every point lies on one of the **affine lines** $x+2y = t$. Even when $S$ is sparse in $\mathbb{Z}$, the lift **concentrates** $A$ on a **family of parallel lines in the plane**—visible as **stripes / ridges** in the heatmap. That **anisotropic alignment** is exactly the kind of **non-pseudorandom** pattern a **grid norm** is meant to **amplify**: heuristically $\lVert f\rVert_{\mathrm{grid}}$ is **large** (well above the $\alpha^2$ “random baseline”), signaling **hidden linear structure** compatible with the proof’s **relative sifting** / **density increment** engine (see [arXiv:2504.07006](https://arxiv.org/abs/2504.07006)).
 
 *Caveat:* this repo does **not** compute a numerical grid norm—only the **occupancy** heatmap—so treat the table below as an **interpretive bridge** to the paper, not measured output.
 
@@ -350,7 +356,7 @@ The manuscript’s **Gowers-type grid norms** (e.g. $(2,k)$-grid / box-type unif
 | Metric | Random Bernoulli | Paper-aligned lift | Paper context |
 |--------|------------------|--------------------|----------------|
 | Grid / box-type norm (order-2 cartoon) | Very low ($\approx \alpha^2$ scale) | High ($\gg \alpha^2$ heuristically) | **Signal** that multilinear averages see structure |
-| Sifting / increment step | No meaningful dense sub-rectangle | Dense structure along **line families** $x+2y=t$ | Where a **density increment** can **latch** |
+| Sifting / increment step | No meaningful dense sub-rectangle | Dense structure along **line families** $x+2y = t$ | Where a **density increment** can **latch** |
 | NOF / “Exactly-$N$” viewpoint (Project 1) | Near-uniform local views | Correlated local views under lift | Corners $\leftrightarrow$ **Exactly-$N$**-type obstructions (informal) |
 
 ### Suggested logic flow (for a written report)
@@ -363,7 +369,7 @@ The manuscript’s **Gowers-type grid norms** (e.g. $(2,k)$-grid / box-type unif
 
 ### Follow-up (non-abelian lifts)
 
-> **Question:** How does the **grid-norm / uniformity** picture change if the lift is taken over a **non-abelian** group instead of $\mathbb{Z}_N$?
+> **Question:** How does the **grid-norm / uniformity** picture change if the lift is taken over a **non-abelian** group instead of $\mathbb{Z}/N\mathbb{Z}$?
 
 The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abelian** quasipolynomial-type bounds can be **exported** to **all finite groups**—a natural place to start if you extend this codebase beyond $\mathbb{Z}$.
 
@@ -378,7 +384,7 @@ The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abe
 | Logic map | Alice / Bob / Charlie NOF views | multi-party NOF / “Exactly-$N$” viewpoint (Project 1) |
 | Heat map | random vs paper lift occupancy | anisotropy / **grid-norm** cartoon (structured vs pseudorandom) |
 | Bar histogram | shell occupancy vs $\sum_i x_i^2 = S$ | density-increment / “clumping” on spheres |
-| Side-by-side grids | equal-leg vs unequal-leg $\mathsf{L}$ | skew vs axis corner (§2.2 narrative) |
+| Side-by-side grids | equal-leg vs unequal-leg $\mathsf{L}$ | skew vs axis corner (Sec. 2.2 narrative) |
 | Triple curve | Shkredov vs Jaber vs Behrend scales | quantitative **saving arc** (schematic) |
 
 ---
@@ -393,7 +399,7 @@ The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abe
 | `research_extensions.py` | Skew search + skew-free constructors, shell CSV/SVG, `grid_norm_pipe_v1`, legacy export, cyclic $S_n$ lift |
 | `docs/skew_corner_free_constructions.md` | Lemmas and CLI notes for skew-free modes |
 | `docs/grid_norm_pipe_schema.md` | **`grid_norm_pipe_v1`** JSON/CSV specification |
-| `docs/diagonal_drop.md` | Diagonal vs coordinate directions (§7.1 reader’s guide) |
+| `docs/diagonal_drop.md` | Diagonal vs coordinate directions (Sec. 7.1 reader’s guide) |
 | `docs/failure_mode_random_vs_behrend.md` | Matched-density random vs Behrend; detector negative control |
 | `docs/grid_norm_k_sensitivity.md` | $(2,k)$-norm $k$ vs density $\alpha$ sensitivity guide |
 | `docs/future_work_3d_corners.md` | 3D corners and 4-party NOF (conceptual) |
