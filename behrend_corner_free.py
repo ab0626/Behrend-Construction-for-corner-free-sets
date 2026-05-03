@@ -418,6 +418,40 @@ def main() -> None:
         default=6,
         help="degree n for S_n cyclic lift (default 6)",
     )
+    p.add_argument(
+        "--skew-free",
+        dest="skew_free",
+        choices=("none", "permutation", "greedy"),
+        default="none",
+        metavar="MODE",
+        help="build a skew-corner-free set in [1,m]×[1,m] (skips Behrend d,k run); "
+        "permutation = graph of π (also axis-corner-free); greedy = random-order maximal set",
+    )
+    p.add_argument(
+        "--skew-free-m",
+        type=int,
+        default=32,
+        metavar="M",
+        help="grid side m for --skew-free (default 32)",
+    )
+    p.add_argument(
+        "--skew-free-seed",
+        type=int,
+        default=0,
+        help="RNG seed for --skew-free permutation / greedy (default 0)",
+    )
+    p.add_argument(
+        "--export-grid-norm-json",
+        metavar="PATH",
+        default=None,
+        help="export grid_norm_pipe_v1 JSON for Grid Norm / clumpiness detector tooling",
+    )
+    p.add_argument(
+        "--export-grid-norm-csv",
+        metavar="PATH",
+        default=None,
+        help="export x,y CSV with grid_norm_pipe_v1 header line (for CSV-only pipelines)",
+    )
     args = p.parse_args()
 
     if args.profile_shells_csv:
@@ -433,6 +467,92 @@ def main() -> None:
             args.profile_shells_svg, args.d, args.k, max_x=args.d**args.k - 1
         )
         print(f"Wrote shell density SVG: {args.profile_shells_svg}")
+        return
+
+    if args.skew_free != "none":
+        import research_extensions as rex
+
+        rng = __import__("random").Random(args.skew_free_seed)
+        m = max(1, args.skew_free_m)
+        if args.skew_free == "permutation":
+            pts = rex.construct_skew_corner_free_permutation(m, rng)
+            label = "skew_free_permutation"
+        else:
+            pts = rex.construct_skew_corner_free_greedy(m, rng)
+            label = "skew_free_greedy"
+        if not rex.is_skew_corner_free(pts):
+            raise RuntimeError("internal error: skew construction contains a skew corner")
+        print(
+            f"skew-free mode={args.skew_free}  m={m}  |P|={len(pts)}  "
+            f"seed={args.skew_free_seed}"
+        )
+        ac = brute_corner_check(pts)
+        if ac:
+            print(f"axis corner in P: {ac} (greedy skew-free may allow d=d' corners)")
+        else:
+            print("No axis corner in P.")
+        if args.skew_check:
+            sk = rex.find_skew_corner(pts)
+            if sk:
+                print(f"unexpected SKEW corner: {sk}")
+            else:
+                print("No skew corner in P (consistent with construction).")
+        if args.symmetric_lift_json:
+            print(
+                "Note: --symmetric-lift-json ignored in --skew-free mode (no 1D shell)."
+            )
+        if args.export_csv:
+            meta = {
+                "skew_free": args.skew_free,
+                "m": m,
+                "seed": args.skew_free_seed,
+            }
+            rex.export_sparse_grid_csv(pts, args.export_csv, meta=meta)
+            print(f"Wrote grid CSV: {args.export_csv}")
+        if args.export_json:
+            rex.export_run_json(
+                args.export_json,
+                mode=label,
+                params={
+                    "skew_free": args.skew_free,
+                    "m": m,
+                    "seed": args.skew_free_seed,
+                },
+                points=pts,
+                one_d_sorted=None,
+            )
+            print(f"Wrote JSON: {args.export_json}")
+        if args.export_grid_norm_json:
+            rex.export_grid_norm_pipe_v1(
+                args.export_grid_norm_json,
+                list(pts),
+                construction=label,
+                parameters={
+                    "skew_free": args.skew_free,
+                    "m": m,
+                    "seed": args.skew_free_seed,
+                },
+                grid_side_n=m,
+            )
+            print(f"Wrote grid-norm pipe JSON: {args.export_grid_norm_json}")
+        if args.export_grid_norm_csv:
+            rex.export_grid_norm_pipe_csv(
+                args.export_grid_norm_csv,
+                list(pts),
+                construction=label,
+                parameters={
+                    "skew_free": args.skew_free,
+                    "m": m,
+                    "seed": args.skew_free_seed,
+                },
+            )
+            print(f"Wrote grid-norm pipe CSV: {args.export_grid_norm_csv}")
+        if args.list:
+            for pt in sorted(pts):
+                print(pt)
+        if args.demo:
+            print()
+            demo()
         return
 
     max_x = args.d**args.k - 1
@@ -555,6 +675,47 @@ def main() -> None:
             one_d_sorted=one_d,
         )
         print(f"Wrote JSON: {args.export_json}")
+
+    if args.export_grid_norm_json or args.export_grid_norm_csv:
+        import research_extensions as rex
+
+        if args.mode == "paper":
+            gparams = {
+                "d": args.d,
+                "k": args.k,
+                "sum_sq": sum_sq,
+                "grid_n": pl.grid_n,
+                "mode": "paper",
+            }
+            gcon = "paper_lift"
+            gside = pl.grid_n
+        else:
+            gparams = {
+                "d": args.d,
+                "k": args.k,
+                "k1": args.k1,
+                "sum_sq": sum_sq,
+                "mode": "digit-split",
+            }
+            gcon = "digit_split"
+            gside = None
+        if args.export_grid_norm_json:
+            rex.export_grid_norm_pipe_v1(
+                args.export_grid_norm_json,
+                list(pts),
+                construction=gcon,
+                parameters=gparams,
+                grid_side_n=gside,
+            )
+            print(f"Wrote grid-norm pipe JSON: {args.export_grid_norm_json}")
+        if args.export_grid_norm_csv:
+            rex.export_grid_norm_pipe_csv(
+                args.export_grid_norm_csv,
+                list(pts),
+                construction=gcon,
+                parameters=gparams,
+            )
+            print(f"Wrote grid-norm pipe CSV: {args.export_grid_norm_csv}")
 
     if args.list:
         for pt in sorted(pts):

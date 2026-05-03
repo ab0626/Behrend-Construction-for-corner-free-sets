@@ -308,6 +308,71 @@ def write_shell_profile_svg(path: str) -> None:
     rex.write_shell_density_svg(path, d=5, k=4, max_x=5**4 - 1)
 
 
+def write_skew_vs_axis_corner_svg(path: str, w: int = 640, h: int = 280) -> None:
+    """
+    Two small grids: axis corner (d = d') vs skew corner (d ≠ d').
+    y increases downward in SVG for readability.
+    """
+    cell = 36
+    pad = 24
+    # Left panel: axis (0,0),(2,0),(0,2) in local 0..3 coords
+    ox, oy = pad, pad
+    def cell_rect(gx: int, gy: int) -> str:
+        cx = ox + gx * cell
+        cy = oy + gy * cell
+        return (
+            f'<rect x="{cx}" y="{cy}" width="{cell-2}" height="{cell-2}" '
+            f'fill="#e8e8e8" stroke="#bbb"/>'
+        )
+
+    lines = [
+        _svg_header(w, h),
+        '<rect width="100%" height="100%" fill="#fafafa"/>',
+        f'<text x="{w//2}" y="20" text-anchor="middle" font-size="14" fill="#222">'
+        "Axis corner (d = d′) vs skew corner (d ≠ d′)</text>",
+    ]
+    for gx in range(4):
+        for gy in range(4):
+            lines.append(cell_rect(gx, gy))
+    # axis corner points at (0,0), (2,0), (0,2) — circles
+    pts_axis = [(0, 0), (2, 0), (0, 2)]
+    for gx, gy in pts_axis:
+        cx = ox + gx * cell + cell // 2
+        cy = oy + gy * cell + cell // 2
+        lines.append(
+            f'<circle cx="{cx}" cy="{cy}" r="10" fill="#c0392b" stroke="#922b21"/>'
+        )
+    lines.append(
+        f'<text x="{ox}" y="{oy + 4 * cell + 22}" font-size="11" fill="#444">'
+        r"Standard corner: (x,y), (x+d,y), (x,y+d)</text>"
+    )
+
+    # Right panel
+    ox2 = w // 2 + 20
+    for gx in range(4):
+        for gy in range(4):
+            cx = ox2 + gx * cell
+            cy = oy + gy * cell
+            lines.append(
+                f'<rect x="{cx}" y="{cy}" width="{cell-2}" height="{cell-2}" '
+                f'fill="#e8e8e8" stroke="#bbb"/>'
+            )
+    pts_skew = [(0, 0), (2, 0), (0, 3)]
+    for gx, gy in pts_skew:
+        cx = ox2 + gx * cell + cell // 2
+        cy = oy + gy * cell + cell // 2
+        lines.append(
+            f'<circle cx="{cx}" cy="{cy}" r="10" fill="#1a5276" stroke="#0e3a52"/>'
+        )
+    lines.append(
+        f'<text x="{ox2}" y="{oy + 4 * cell + 22}" font-size="11" fill="#444">'
+        r"Skew corner: (x,y), (x+d,y), (x,y+d′), d ≠ d′</text>"
+    )
+    lines.append("</svg>")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+
+
 def main() -> None:
     out_dir = os.path.dirname(os.path.abspath(__file__))
     paths = [
@@ -316,6 +381,7 @@ def main() -> None:
         ("lift_projection.svg", write_lift_projection_svg),
         ("nof_sketch.svg", write_nof_sketch_svg),
         ("shell_density_profile.svg", write_shell_profile_svg),
+        ("skew_vs_axis_corner.svg", write_skew_vs_axis_corner_svg),
     ]
     for name, fn in paths:
         p = os.path.join(out_dir, name)
