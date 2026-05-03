@@ -1,31 +1,48 @@
 # Corner-Free Set Generator (Behrend Construction)
 
-## Description
+## Contents
 
-**Corner-Free Set Generator** is a small Python **research demo** tied to Behrend-type constructions and the corners problem. It builds a **1D digit-shell** set $S$ (integers whose base-$d$ digits lie on a fixed “sphere” $\sum_i x_i^2 = \mathrm{const}$), optionally chooses a shell with **no 3-term arithmetic progression**, then forms the paper-style **2D lift** $A = \{(x,y) \in [n]^2 : x+2y \in S\}$. A corner $(x,y),(x+d,y),(x,y+d)$ in $A$ would force a 3-AP in $S$; the script **searches for such corners** so you can contrast the rigorous lift with a **naive digit-split** embedding (which need not stay corner-free). Stdlib-only **SVG figures** illustrate the projection, density intuition, heatmaps, and an NOF sketch for talks.
+| Section | What |
+|---------|------|
+| [Overview](#overview) | Problem, lift, and outputs |
+| [Quick start](#quick-start) | Commands: CLI, tests, figures |
+| [Gallery & proofs](#visual-gallery-inline) | Figures, where formal proofs live |
+| [Alignment with the paper](#alignment-with-the-paper-jaber-et-al-2025) | Curvature, sifting, Behrend regime, NOF |
+| [§1–4](#1-geometry-of-the-lift-projection-equivalence) | Lift, density, NOF, heatmaps |
+| [Files](#file-map) | Repo layout |
 
-**Run**
+---
+
+## Overview
+
+**Corner-Free Set Generator** is a Python **research demo** for Behrend-type **digit-shell** sets $S$ (fixed $\sum_i x_i^2$ in base $d$), an optional **3-AP-free** shell choice, and the paper-style **lift** $A = \{(x,y) \in [n]^2 : x+2y \in S\}$. It **checks for axis corners** and contrasts the lift with a **digit-split** embedding. Companion to [Jaber et al., arXiv:2504.07006](https://arxiv.org/abs/2504.07006)—see [Formal proofs](#formal-proofs-where-they-live). **Stdlib-only** SVGs (projection, density, heatmaps, NOF sketch).
+
+---
+
+## Quick start
+
+**Requirements:** Python **3.9+** (no pip dependencies for core scripts).
 
 ```bash
+# CLI (default: paper lift + AP-free shell)
 python behrend_corner_free.py --help
 python behrend_corner_free.py --demo
 python behrend_corner_free.py --mode paper
-python behrend_corner_free.py --mode digit-split
-```
+python behrend_corner_free.py --mode digit-split --d 7 --k 5 --k1 2
 
-**Figures (optional, stdlib-only)** — regenerates every chart in a few seconds:
+# Unit tests
+python -m unittest discover -s tests -p "test_*.py" -v
 
-```bash
+# Regenerate README figures (SVG)
 python figures/generate_figures.py
+
+# Optional: reformat README math delimiters after hand-edits
+python scripts/format_readme_math.py
 ```
 
-**Requirements:** Python **3.9+** (stdlib only for `behrend_corner_free.py` and `figures/generate_figures.py`).
+**Useful flags:** `--d`, `--k`, `--S`, `--grid-n`, `--dense-shell` (paper mode: max shell even if 3-AP), `--list`, `--demo`.
 
-**CLI (main script):** `python behrend_corner_free.py` defaults to **`--mode paper`** (AP-free shell + `x+2y` lift). Useful flags: `--mode digit-split`, `--d`, `--k`, `--S`, `--grid-n`, `--dense-shell`, `--list`, `--demo`. See `--help`.
-
-**Tests:** `python -m unittest discover -s tests -p "test_*.py" -v` (stdlib only; covers digit shell, 3-AP check, paper lift, digit-split corner, corner oracles).
-
-**Mathematical notation (GitHub):** Inline math uses `$...$`; display uses `$$` on its own lines ([GitHub math docs](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)). In markdown **tables**, avoid raw `|` inside formulas—use `\lvert`, `\rvert`, or `\lVert`/`\rVert` for cardinality/norms.
+**Math in this file:** GitHub renders `$...$` and `$$...$$` ([docs](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)). In **tables**, use `\lvert`/`\rvert` instead of raw `|` in formulas.
 
 ## Visual gallery (inline)
 
@@ -33,7 +50,7 @@ python figures/generate_figures.py
 |:---:|:---:|:---:|:---:|
 | ![Lift: 3-AP to corner](figures/lift_projection.svg) | ![Density vs N](figures/density_comparison.svg) | ![Heatmaps](figures/heatmap_lift_vs_random.svg) | ![NOF players](figures/nof_sketch.svg) |
 
-*Regenerate before exporting: `python figures/generate_figures.py`.*
+Regenerate after changing parameters: `python figures/generate_figures.py`.
 
 ## Formal proofs (where they live)
 
@@ -49,7 +66,7 @@ python figures/generate_figures.py
 - On GitHub, **each branch** has its **own** `README.md` and `figures/`—merge or cherry-pick if you split work across branches.
 - README images use **relative** paths (`figures/…`). If a viewer blocks inline SVG, open the files locally or export to PNG.
 
-## How this code aligns with the paper (Jaber–Liu–Lovett–Ostuni–Sawhney)
+## Alignment with the paper (Jaber et al., 2025)
 
 Primary reference: **Michael Jaber, Yang P. Liu, Shachar Lovett, Anthony Ostuni, Mehtaab Sawhney**, *Quasipolynomial bounds for the corners theorem*, [arXiv:2504.07006](https://arxiv.org/abs/2504.07006). That work proves (for corner-free $A \subseteq G \times G$) an upper bound of the form $|A| \le |G|^2 \exp(-(\log|G|)^{\Omega(1)})$, and derives communication consequences in the **3-player Number-on-Forehead** model. This repository does **not** reimplement those proofs; it is a **hands-on companion** for Behrend-type **inputs** and the **$x+2y$** lift.
 
@@ -166,9 +183,7 @@ If your **Project 1** code uses a Number-on-Forehead (NOF) model (players see al
 | Left | random Bernoulli mask with $p \approx \lvert A\rvert/n^2$ |
 | Right | paper lift $A=\{(x,y): x+2y\in S\}$ |
 
-`figures/generate_figures.py` uses the **smallest** $n$ for which $x+2y$ can reach **all** of $S$ (up to $d^k$), then **downsamples** to a fixed display size for the SVG. *Capping* $n$ at 64 (or any value **below** that minimum) made the lift **empty** and both panels black.
-
-The heatmap SVG uses **merged rectangles** (not thousands of 2px squares) so it stays fast to open; GitHub’s README preview may **shrink** the figure—click **Open raw** or download the SVG for full size.
+**Implementation (heatmap):** `figures/generate_figures.py` picks an AP-free shell for $(d,k)=(7,4)$ (fallback $(5,4)$), sets **grid size** $n_{\mathrm{full}} = \texttt{default\_grid\_n\_for\_lift}(S)$ so $\max(x+2y)=3n_{\mathrm{full}}$ can reach $\max(S)$—required so the lift is **non-empty**. It draws a **downsampled** grid (default **56×56** bins) with **run-length merged** SVG rects (readable tile size, ~hundreds of DOM nodes). *Never* cap $n$ below $n_{\mathrm{full}}$ when interpreting $\{(x,y):x+2y\in S\}$, or the lift collapses to **empty** ($p=0$). GitHub’s README preview may **shrink** the SVG; use **Open raw** on the file for full width.
 
 ![Random mask vs paper lift occupancy](figures/heatmap_lift_vs_random.svg)
 
@@ -222,11 +237,24 @@ The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abe
 | File | Purpose |
 |------|---------|
 | `behrend_corner_free.py` | Sphere shell, `paper_lift_from_set`, AP-free shell picker, corner checks, CLI |
-| `figures/generate_figures.py` | Writes `density_comparison.svg`, `heatmap_lift_vs_random.svg`, `lift_projection.svg`, `nof_sketch.svg` |
+| `figures/generate_figures.py` | Builds four SVGs (density chart; heatmaps with $n_{\mathrm{full}}$ + RLE; lift schematic; NOF sketch) |
 | `tests/test_behrend_corner_free.py` | `unittest` suite (sphere slice, AP detection, paper lift vs digit-split) |
 | `scripts/format_readme_math.py` | Optional: normalize TeX delimiters in `README.md` |
 | `README.md` | Visual proof-of-concept guide (this file) |
 | `LICENSE` | MIT (see repo root) |
 | `.gitignore` | Python / venv noise |
 
-Paper context: [arXiv:2504.07006](https://arxiv.org/abs/2504.07006) (corners, Roth-type links, Behrend-type scale — adjust section citations to match your PDF edition).
+**Citation (BibTeX):**
+
+```bibtex
+@misc{jaber2025quasipolynomial,
+  title={Quasipolynomial bounds for the corners theorem},
+  author={Jaber, Michael and Liu, Yang P. and Lovett, Shachar and Ostuni, Anthony and Sawhney, Mehtaab},
+  year={2025},
+  eprint={2504.07006},
+  archivePrefix={arXiv},
+  primaryClass={math.CO}
+}
+```
+
+Paper context: [arXiv:2504.07006](https://arxiv.org/abs/2504.07006) — adjust section numbers to your PDF edition.
