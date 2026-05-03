@@ -8,6 +8,8 @@ This document describes the JSON (and optional CSV) format produced by `research
 
 **Batch / validation:** [`scripts/paper_compliance_loop.py`](../scripts/paper_compliance_loop.py) writes `grid_norm_pipe_export.json` plus a **Paper Compliance Report** (Markdown + JSON) and can forward the same file to an external detector via `--detector-cmd '... {json_path} ...'`.
 
+**Pedagogy:** paired **Behrend vs random** exports at matched density — [`failure_mode_random_vs_behrend.md`](failure_mode_random_vs_behrend.md). Choosing **$k$** in $(2,k)$-type norms — [`grid_norm_k_sensitivity.md`](grid_norm_k_sensitivity.md).
+
 ---
 
 ## Versioning

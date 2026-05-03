@@ -9,6 +9,7 @@
 | [Verify locally](#verify-locally) | Tests, figures, compliance smoke |
 | [Research extensions](#research-extensions-benchmark-style) | Skew search + **constructions**, shell profile, **grid_norm** pipe, $S_n$ demo |
 | [Docs (math + schema)](#supplementary-documents) | Skew-free lemmas, `grid_norm_pipe_v1` spec |
+| [Definitive reference polish](#definitive-reference-polish) | Failure mode, $k$-sensitivity, 3D / NOF future work |
 | [Capstone](#capstone-validation-loop-quantitative-arc-diagonal-drop) | Compliance loop, saving arc, diagonal drop |
 | [Gallery & proofs](#visual-gallery-inline) | Figures, where formal proofs live |
 | [Alignment with the paper](#alignment-with-the-paper-jaber-et-al-2025) | Curvature, sifting, Behrend regime, NOF |
@@ -111,6 +112,36 @@ These bridge **lower-bound-style constructions** (Behrend shell + lift) toward *
 | [docs/skew_corner_free_constructions.md](docs/skew_corner_free_constructions.md) | Definitions, lemmas (permutation graph), greedy caveats, CLI |
 | [docs/grid_norm_pipe_schema.md](docs/grid_norm_pipe_schema.md) | Full **`grid_norm_pipe_v1`** JSON/CSV field reference for tooling |
 | [docs/diagonal_drop.md](docs/diagonal_drop.md) | §7.1-style **diagonal vs coordinate** narrative (for Grid Norm / Exactly-$N$ repos) |
+| [docs/failure_mode_random_vs_behrend.md](docs/failure_mode_random_vs_behrend.md) | **Negative control:** random vs Behrend at matched $\alpha$; Von Neumann / norm contrast |
+| [docs/grid_norm_k_sensitivity.md](docs/grid_norm_k_sensitivity.md) | **$(2,k)$-norm:** $k$ too small $\Rightarrow$ no signal; too large $\Rightarrow$ variance; heuristic $k \sim \log(1/\alpha)$ |
+| [docs/future_work_3d_corners.md](docs/future_work_3d_corners.md) | **§1.3-style** 3D corners $\leftrightarrow$ 4-party NOF (conceptual; not in code) |
+
+---
+
+## Definitive reference polish
+
+These are **documentation-only** “last mile” items for talks, reviewers, and sibling repos (**Grid Norm detector**, **Exactly-$N$**). They do not change the mathematical core of this codebase.
+
+### 1. Failure mode (negative result)
+
+At **matched** density $\lvert A\rvert/n^2$, a **Bernoulli random** subset of $[n]^2$ is typically **not** corner-free, while the **Behrend paper lift** is—yet detectors should see a **much larger structured signal** on the lift (anisotropy along $x+2y$). That contrast is the empirical face of a **Von Neumann–type** separation: **uniformity ≠ density**. Full protocol: **[`docs/failure_mode_random_vs_behrend.md`](docs/failure_mode_random_vs_behrend.md)** (copy into your detector repo’s `docs/` if desired).
+
+### 2. Parameter sensitivity for $(2,k)$-type grid norms
+
+The paper’s uniformity layer is **sensitive** to the multilinearity degree $k$. **[`docs/grid_norm_k_sensitivity.md`](docs/grid_norm_k_sensitivity.md)** summarizes **zero-signal** vs **variance explosion** failure modes and a practical **$k$ vs $\alpha$** heuristic (e.g. start near $\log(1/\alpha)$, sweep, validate on Behrend vs random).
+
+### 3. 3D corners and higher-party NOF (future work)
+
+**[`docs/future_work_3d_corners.md`](docs/future_work_3d_corners.md)** records the **3D corner** pattern $(x,y,z),(x+d,y,z),(x,y+d,z),(x,y,z+d)$ and its **conceptual** link to **4-player NOF**, per the paper’s **§1.3** thread—while this repo stays **2D**-first.
+
+### Ecosystem map (lifecycle of the corners theorem)
+
+| Module (your lab) | Role | Paper anchor (verify in your PDF) |
+|-------------------|------|-------------------------------------|
+| **Behrend generator** (this repo) | Constructive **lower bound** / lift | §2.1-style inputs; projection $x+2y$ |
+| **Grid norm pipe** + detector | **Structural detection** / uniformity | Grid-type lemmas (e.g. **Lemma 5.11** area—check edition) |
+| **Bohr / regularity** tooling (elsewhere) | **Geometric maintenance** of structured pieces | §6 / Definition 6.3 style |
+| **Exactly-$N$** application (elsewhere) | **Communication** / complexity | Corollary 1.7 style |
 
 ---
 
@@ -363,6 +394,9 @@ The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abe
 | `docs/skew_corner_free_constructions.md` | Lemmas and CLI notes for skew-free modes |
 | `docs/grid_norm_pipe_schema.md` | **`grid_norm_pipe_v1`** JSON/CSV specification |
 | `docs/diagonal_drop.md` | Diagonal vs coordinate directions (§7.1 reader’s guide) |
+| `docs/failure_mode_random_vs_behrend.md` | Matched-density random vs Behrend; detector negative control |
+| `docs/grid_norm_k_sensitivity.md` | $(2,k)$-norm $k$ vs density $\alpha$ sensitivity guide |
+| `docs/future_work_3d_corners.md` | 3D corners and 4-party NOF (conceptual) |
 | `tests/test_behrend_corner_free.py` | `unittest` suite (sphere slice, AP detection, paper lift vs digit-split) |
 | `tests/test_research_extensions.py` | Skew constructions, grid-norm JSON, shell counts, cyclic $S_n$ |
 | `scripts/format_readme_math.py` | Optional: normalize TeX delimiters in `README.md` |
