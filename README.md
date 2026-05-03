@@ -35,7 +35,7 @@ python figures/generate_figures.py
 
 | What | Where |
 |------|--------|
-| **Full proofs** (grid norms, density increments, main theorems) | The manuscript: **[arXiv:2504.07006](https://arxiv.org/abs/2504.07006)** (PDF on arXiv or your local v2 copy). This repo is a **computational companion**, not a LaTeX rewrite of the paper. |
+| **Full proofs** (grid norms, relative sifting, main theorem) | **Jaber–Liu–Lovett–Ostuni–Sawhney (2025):** [arXiv:2504.07006](https://arxiv.org/abs/2504.07006). This repo is a **computational companion**, not a LaTeX rewrite. |
 | **Lift-only argument** (corner in \(A\) \(\Rightarrow\) 3-AP in \(S\) for \(x+2y\)) | Short proof sketch in the **module docstring** at the top of [`behrend_corner_free.py`](behrend_corner_free.py). |
 | **Empirical checks** | `find_three_term_ap`, `brute_corner_check`, `find_corner_smart` in the same file—they **verify instances**, they do not replace the paper’s proofs. |
 
@@ -44,6 +44,28 @@ python figures/generate_figures.py
 - **This repository** tracks everything on **`main`** ([`ab0626/Behrend-Construction-for-corner-free-sets`](https://github.com/ab0626/Behrend-Construction-for-corner-free-sets)). You do **not** need extra branches unless you want a separate line of work (e.g. `slides`, `gh-pages`, or a course hand-in tag).
 - On GitHub, **each branch** has its **own** `README.md` and `figures/`—merge or cherry-pick if you split work across branches.
 - README images use **relative** paths (`figures/…`). If a viewer blocks inline SVG, open the files locally or export to PNG.
+
+## How this code aligns with the paper (Jaber–Liu–Lovett–Ostuni–Sawhney)
+
+Primary reference: **Michael Jaber, Yang P. Liu, Shachar Lovett, Anthony Ostuni, Mehtaab Sawhney**, *Quasipolynomial bounds for the corners theorem*, [arXiv:2504.07006](https://arxiv.org/abs/2504.07006). That work proves (for corner-free \(A \subseteq G \times G\)) an upper bound of the form \(|A| \le |G|^2 \exp(-(\log|G|)^{\Omega(1)})\), and derives communication consequences in the **3-player Number-on-Forehead** model. This repository does **not** reimplement those proofs; it is a **hands-on companion** for Behrend-type **inputs** and the **\(x+2y\)** lift.
+
+### 1. Curvature, sphere shells, and 3-AP freeness
+
+Behrend’s idea is to place digits on a **high-dimensional sphere** (fixed \(\sum_i x_i^2\)), so “most” **linear** relations that would create a **3-term AP** fail for **geometric** reasons—often described informally as **curvature**: three collinear points in digit space typically miss the shell. In this project, the **1D** object \(S\) is a **discrete** sphere slice in base \(d\); when you additionally enforce **no 3-AP** among shells (`best_S_ap_free_max_count`), you make explicit the hypothesis needed for the **\(x+2y\)** lift to rule out **axis corners** in \(A\). That is the same **Roth / corners** bridge the paper exploits via **projections** (corners \(\leftrightarrow\) 3-APs).
+
+### 2. Relative sifting and “sparse but structured”
+
+A recurring theme in modern arguments is **relative** or **sparse** analysis: extracting structure **inside** a **sparse** set or majorant. Your lifted set \(A=\{(x,y):x+2y\in S\}\) is **sparse** in \([n]^2\), yet it is **highly structured**—mass lies on **lines** \(x+2y=t\). That is the **anisotropic clumpiness** the heatmap is meant to suggest: a **pseudorandom** set has **small** multilinear uniformity (order-2 **grid / box** control), while a **structured** lift produces **large** multilinear biases—exactly the kind of **signal** a **density increment** or **sifting** step must detect in a corner-free **upper-bound** proof. (The README still does **not** compute norms numerically; it only **visualizes** support.)
+
+### 3. The Behrend regime vs older density losses
+
+For decades, **lower bounds** for AP-free / corner-related phenomena have hovered near **Behrend’s** scale—roughly **\(\exp(-\Theta(\sqrt{\log N}))\)** in \(\mathbb{Z}/N\mathbb{Z}\) (up to log factors in different normalizations). Many **earlier** upper-bound arguments in related areas incurred much weaker losses—often caricatured as **doubly logarithmic** (\(1/\log\log N\)-type savings). The 2025 corners result is significant because the **upper bound** on corner-free sets now approaches that **quasipolynomial / Behrend-type** scale from the **other side**, nearly **matching** the classical construction density in a way prior bounds did not.
+
+> **Professor-ready one-liner:** While some classical lines of attack yielded only **doubly logarithmic** density savings, Behrend-type constructions live at density \(\exp(-\Theta((\log N)^{1/2}))\). Recent breakthroughs—notably **Jaber, Liu, Lovett, Ostuni, Sawhney (2025)** on [arXiv:2504.07006](https://arxiv.org/abs/2504.07006)—prove **quasipolynomial** upper bounds for corner-free sets, bringing the **provable** obstruction much closer to the **Behrend regime** that has long anchored lower-bound thinking.
+
+### 4. NOF communication and Exactly-\(N\)
+
+The paper explains how strong **corner-free-set** bounds imply **polynomial-length** lower bounds for **nondeterministic** protocols for **Exactly-\(N\)** in the **3-player NOF** model. Intuitively, **large structured** sets that **avoid corners** are the **combinatorial heart** of those lower-bound arguments; your generator exposes the **same lift geometry** (Section 4 heatmap + NOF sketch) that underpins that communication story.
 
 ---
 
