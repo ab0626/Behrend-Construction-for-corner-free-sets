@@ -19,6 +19,18 @@ python behrend_corner_free.py --mode digit-split
 python figures/generate_figures.py
 ```
 
+**Requirements:** Python **3.9+** (stdlib only for `behrend_corner_free.py` and `figures/generate_figures.py`).
+
+**CLI (main script):** `python behrend_corner_free.py` defaults to **`--mode paper`** (AP-free shell + `x+2y` lift). Useful flags: `--mode digit-split`, `--d`, `--k`, `--S`, `--grid-n`, `--dense-shell`, `--list`, `--demo`. See `--help`.
+
+## Visual gallery (inline)
+
+| Lift schematic | Density comparison | Heatmap (random vs lift) | NOF sketch |
+|:---:|:---:|:---:|:---:|
+| ![Lift: 3-AP to corner](figures/lift_projection.svg) | ![Density vs N](figures/density_comparison.svg) | ![Heatmaps](figures/heatmap_lift_vs_random.svg) | ![NOF players](figures/nof_sketch.svg) |
+
+*Regenerate before exporting: `python figures/generate_figures.py`.*
+
 ## Formal proofs (where they live)
 
 | What | Where |
@@ -32,14 +44,6 @@ python figures/generate_figures.py
 - **This repository** tracks everything on **`main`** ([`ab0626/Behrend-Construction-for-corner-free-sets`](https://github.com/ab0626/Behrend-Construction-for-corner-free-sets)). You do **not** need extra branches unless you want a separate line of work (e.g. `slides`, `gh-pages`, or a course hand-in tag).
 - On GitHub, **each branch** has its **own** `README.md` and `figures/`—merge or cherry-pick if you split work across branches.
 - README images use **relative** paths (`figures/…`). If a viewer blocks inline SVG, open the files locally or export to PNG.
-
-### Visual gallery (inline)
-
-| Lift schematic | Density comparison | Heatmap (random vs lift) | NOF sketch |
-|:---:|:---:|:---:|:---:|
-| ![Lift: 3-AP to corner](figures/lift_projection.svg) | ![Density vs N](figures/density_comparison.svg) | ![Heatmaps](figures/heatmap_lift_vs_random.svg) | ![NOF players](figures/nof_sketch.svg) |
-
-*Regenerate before exporting: `python figures/generate_figures.py`.*
 
 ---
 
@@ -190,5 +194,7 @@ The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abe
 | `behrend_corner_free.py` | Sphere shell, `paper_lift_from_set`, AP-free shell picker, corner checks, CLI |
 | `figures/generate_figures.py` | Writes `density_comparison.svg`, `heatmap_lift_vs_random.svg`, `lift_projection.svg`, `nof_sketch.svg` |
 | `README.md` | Visual proof-of-concept guide (this file) |
+| `LICENSE` | MIT (see repo root) |
+| `.gitignore` | Python / venv noise |
 
 Paper context: [arXiv:2504.07006](https://arxiv.org/abs/2504.07006) (corners, Roth-type links, Behrend-type scale — adjust section citations to match your PDF edition).
