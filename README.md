@@ -166,6 +166,8 @@ If your **Project 1** code uses a Number-on-Forehead (NOF) model (players see al
 | Left | random Bernoulli mask with $p \approx \lvert A\rvert/n^2$ |
 | Right | paper lift $A=\{(x,y): x+2y\in S\}$ |
 
+`figures/generate_figures.py` uses the **smallest** $n$ for which $x+2y$ can reach **all** of $S$ (up to $d^k$), then **downsamples** to a fixed display size for the SVG. *Capping* $n$ at 64 (or any value **below** that minimum) made the lift **empty** and both panels black.
+
 ![Random mask vs paper lift occupancy](figures/heatmap_lift_vs_random.svg)
 
 ### Why the two panels look different (paper-style reasoning)

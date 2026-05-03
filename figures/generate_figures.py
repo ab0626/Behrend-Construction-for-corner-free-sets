@@ -95,57 +95,113 @@ def write_density_svg(path: str, w: int = 800, h: int = 480) -> None:
         f.write("\n".join(parts))
 
 
-def write_heatmap_svg(path: str, n: int = 64) -> None:
+def _downsample_grid(
+    points: set[tuple[int, int]], n_src: int, n_dst: int
+) -> list[list[float]]:
+    """Map [1,n_src]^2 occupancy into n_dst×n_dst bins (linear binning)."""
+    m = [[0.0] * n_dst for _ in range(n_dst)]
+    if n_src < 1 or n_dst < 1:
+        return m
+    for x, y in points:
+        if not (1 <= x <= n_src and 1 <= y <= n_src):
+            continue
+        xd = min(n_dst - 1, (x - 1) * n_dst // n_src)
+        yd = min(n_dst - 1, (y - 1) * n_dst // n_src)
+        m[yd][xd] = 1.0
+    return m
+
+
+def write_heatmap_svg(path: str, max_display: int = 96) -> None:
+    """
+    Paper lift vs matched-density Bernoulli mask.
+
+    Important: the grid side must be large enough that x+2y can hit values in S.
+    Previously we wrongly used min(64, n_needed), which forced n=64 while S could
+    require n≈800 — then x+2y≤192 never reached large shell elements, giving an
+    empty lift and p=0 (blank figure).
+    """
     import behrend_corner_free as b
 
     d, k = 7, 4
-    sum_sq, _ = b.best_S_ap_free_max_count(d, k, max_x=d**k - 1)
-    s1 = b.build_behrend_sphere_slice(d, k, sum_sq, max_x=d**k - 1)
-    n = min(n, b.default_grid_n_for_lift(s1, d**k - 1))
-    lift = set(b.paper_lift_from_set(s1, n))
-    m = [[0.0] * n for _ in range(n)]
-    for x, y in lift:
-        if 1 <= x <= n and 1 <= y <= n:
-            m[y - 1][x - 1] = 1.0
-    p = sum(sum(row) for row in m) / (n * n)
-    # deterministic pseudo-random Bernoulli(p)
-    rand = [[0.0] * n for _ in range(n)]
+    max_x = d**k - 1
+    sum_sq, _ = b.best_S_ap_free_max_count(d, k, max_x=max_x)
+    s1 = b.build_behrend_sphere_slice(d, k, sum_sq, max_x=max_x)
+
+    n_full = b.default_grid_n_for_lift(s1, max_x)
+    lift = set(b.paper_lift_from_set(s1, n_full))
+    # Fallback if shell has only unreachable residues (e.g. pathological small instance)
+    if not lift:
+        d, k = 5, 4
+        max_x = d**k - 1
+        sum_sq, _ = b.best_S_ap_free_max_count(d, k, max_x=max_x)
+        s1 = b.build_behrend_sphere_slice(d, k, sum_sq, max_x=max_x)
+        n_full = b.default_grid_n_for_lift(s1, max_x)
+        lift = set(b.paper_lift_from_set(s1, n_full))
+
+    n_cells = n_full * n_full
+    p = len(lift) / n_cells if n_cells else 0.0
+
+    disp = min(max_display, n_full)
+    if disp < 1:
+        disp = 1
+    if n_full <= disp:
+        m_lift = [[0.0] * n_full for _ in range(n_full)]
+        for x, y in lift:
+            m_lift[y - 1][x - 1] = 1.0
+    else:
+        m_lift = _downsample_grid(lift, n_full, disp)
+
+    rand = [[0.0] * disp for _ in range(disp)]
     seed = 12345
-    for i in range(n):
-        for j in range(n):
+    for i in range(disp):
+        for j in range(disp):
             seed = (1103515245 * seed + 12345) % (2**31)
             rand[i][j] = 1.0 if (seed / 2**31) < p else 0.0
 
-    cell = 5
-    gap = 8
-    bw = n * cell + gap + n * cell
-    bh = n * cell + 60
-    parts = [_svg_header(bw, bh), '<rect width="100%" height="100%" fill="#222"/>']
+    cell = max(3, min(8, 650 // (2 * disp + 16)))
+    gap = 12
+    bw = disp * cell + gap + disp * cell + 40
+    bh = disp * cell + 72
+
+    parts = [_svg_header(bw, bh), '<rect width="100%" height="100%" fill="#eceff4"/>']
 
     def rect_color(v: float) -> str:
-        if v < 0.5:
-            t = int(40 + 180 * (v * 2))
-            return f"rgb({t},{t//2},{t//3})"
-        t = int(200 + 55 * ((v - 0.5) * 2))
-        return f"rgb({min(255,t+40)},{min(255,t//2)},{min(255,t//4)})"
+        # Light grid background for empty; vivid red for occupied (readable on slide)
+        if v <= 0.001:
+            return "#d8dee9"
+        return "#bf616a"
 
-    def draw_grid(data: list[list[float]], ox: int, oy: int, title: str) -> None:
+    def draw_grid(
+        data: list[list[float]], ox: int, oy: int, title: str
+    ) -> None:
         parts.append(
-            f'<text x="{ox + n*cell//2}" y="{oy-8}" text-anchor="middle" '
-            f'fill="#eee" font-size="12">{title}</text>'
+            f'<text x="{ox + disp*cell//2}" y="{oy-10}" text-anchor="middle" '
+            f'fill="#2e3440" font-size="11">{title}</text>'
         )
-        for i in range(n):
-            for j in range(n):
+        for i in range(disp):
+            for j in range(disp):
                 c = rect_color(data[i][j])
                 parts.append(
-                    f'<rect x="{ox+j*cell}" y="{oy+i*cell}" width="{cell-1}" height="{cell-1}" fill="{c}"/>'
+                    f'<rect x="{ox+j*cell}" y="{oy+i*cell}" width="{cell-1}" '
+                    f'height="{cell-1}" fill="{c}" stroke="#c5cddb" stroke-width="0.3"/>'
                 )
 
-    draw_grid(rand, 10, 40, f"random Bernoulli(p), p={p:.3f}")
-    draw_grid(m, 10 + n * cell + gap, 40, f"paper lift (|S|={len(s1)}, n={n})")
+    sub = f"display {disp}x{disp}" if disp < n_full else f"{n_full}x{n_full}"
+    draw_grid(
+        rand,
+        20,
+        48,
+        f"random Bernoulli(p), p={p:.4f} (same density as right)",
+    )
+    draw_grid(
+        m_lift,
+        20 + disp * cell + gap,
+        48,
+        f"paper lift (|A|={len(lift)}, |S|={len(s1)}, grid n={n_full}; {sub})",
+    )
     parts.append(
-        f'<text x="{bw//2}" y="{bh-12}" text-anchor="middle" fill="#aaa" font-size="11">'
-        "Heatmaps (illustrative)</text>"
+        f'<text x="{bw//2}" y="{bh-14}" text-anchor="middle" fill="#4c566a" font-size="11">'
+        "Heatmaps — lines x+2y=const visible when n is large enough to reach all of S</text>"
     )
     parts.append("</svg>")
     with open(path, "w", encoding="utf-8") as f:
