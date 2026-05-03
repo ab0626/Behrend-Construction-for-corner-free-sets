@@ -162,15 +162,38 @@ def main() -> None:
     p.add_argument("--k", type=int, default=5)
     p.add_argument("--S", type=int, default=None, metavar="SUM_SQ")
     p.add_argument("--grid-n", type=int, default=None)
-    p.add_argument("--write-dir", type=str, required=True, metavar="DIR")
+    p.add_argument(
+        "--write-dir",
+        type=str,
+        default="reports/compliance_output",
+        metavar="DIR",
+        help="output directory (default: reports/compliance_output)",
+    )
     p.add_argument(
         "--detector-cmd",
         type=str,
         default=None,
         help='Shell command; use placeholder {json_path} for grid_norm_pipe JSON file.',
     )
-    p.add_argument("--max-d", type=int, default=14)
-    p.add_argument("--max-k", type=int, default=7)
+    p.add_argument(
+        "--max-d",
+        type=int,
+        default=10,
+        help="density search: maximum base d (default 10; raise with patience)",
+    )
+    p.add_argument(
+        "--max-k",
+        type=int,
+        default=5,
+        help="density search: maximum digits k (default 5)",
+    )
+    p.add_argument(
+        "--max-universe",
+        type=int,
+        default=40_000,
+        metavar="U",
+        help="skip (d,k) with d^k-1 > U to keep search tractable (default 40000)",
+    )
     p.add_argument(
         "--reference",
         type=str,
@@ -195,6 +218,7 @@ def main() -> None:
             tgt,
             max_d=args.max_d,
             max_k=args.max_k,
+            max_universe=args.max_universe,
         )
         alpha_target = tgt
 

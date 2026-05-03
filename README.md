@@ -59,6 +59,8 @@ python behrend_corner_free.py --mode paper --d 5 --k 4 --S 8 --grid-n 30 \
   --export-grid-norm-json behrend_as_grid_norm.json
 
 # Paper compliance loop: lift near target α → grid_norm JSON → optional detector → report
+# (default output: reports/compliance_output/; override with --write-dir)
+python scripts/paper_compliance_loop.py --target-alpha 0.05
 python scripts/paper_compliance_loop.py --target-alpha 0.02 --write-dir reports/demo1
 ```
 
@@ -104,6 +106,7 @@ Script **[`scripts/paper_compliance_loop.py`](scripts/paper_compliance_loop.py)*
 4. **Paper Compliance Report** — `paper_compliance_report.md` + `.json` with axis-corner check, AP-in-shell check, and an informal **row clumpiness proxy** (max/mean occupancy per $y$).
 
 ```bash
+python scripts/paper_compliance_loop.py --target-alpha 0.05
 python scripts/paper_compliance_loop.py --target-alpha 0.025 --write-dir reports/demo
 python scripts/paper_compliance_loop.py --no-search --d 7 --k 5 --write-dir reports/fixed \\
     --detector-cmd "python path/to/grid_norm_cli.py --input {json_path}"
