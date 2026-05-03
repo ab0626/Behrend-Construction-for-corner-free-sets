@@ -19,7 +19,19 @@ python behrend_corner_free.py --mode digit-split
 python figures/generate_figures.py
 ```
 
-**Branches / hosting:** Images use relative paths (`figures/…`). On GitHub (or any host), each **branch** shows the `README.md` and `figures/` from **that** branch—commit the SVGs on the branch you present. If a viewer blocks inline SVG, open the files locally or export to PNG from a browser.
+## Formal proofs (where they live)
+
+| What | Where |
+|------|--------|
+| **Full proofs** (grid norms, density increments, main theorems) | The manuscript: **[arXiv:2504.07006](https://arxiv.org/abs/2504.07006)** (PDF on arXiv or your local v2 copy). This repo is a **computational companion**, not a LaTeX rewrite of the paper. |
+| **Lift-only argument** (corner in \(A\) \(\Rightarrow\) 3-AP in \(S\) for \(x+2y\)) | Short proof sketch in the **module docstring** at the top of [`behrend_corner_free.py`](behrend_corner_free.py). |
+| **Empirical checks** | `find_three_term_ap`, `brute_corner_check`, `find_corner_smart` in the same file—they **verify instances**, they do not replace the paper’s proofs. |
+
+## Branches and hosting
+
+- **This repository** tracks everything on **`main`** ([`ab0626/Behrend-Construction-for-corner-free-sets`](https://github.com/ab0626/Behrend-Construction-for-corner-free-sets)). You do **not** need extra branches unless you want a separate line of work (e.g. `slides`, `gh-pages`, or a course hand-in tag).
+- On GitHub, **each branch** has its **own** `README.md` and `figures/`—merge or cherry-pick if you split work across branches.
+- README images use **relative** paths (`figures/…`). If a viewer blocks inline SVG, open the files locally or export to PNG.
 
 ### Visual gallery (inline)
 
@@ -126,6 +138,38 @@ If your **Project 1** code uses a Number-on-Forehead (NOF) model (players see al
 
 ![Random mask vs paper lift occupancy](figures/heatmap_lift_vs_random.svg)
 
+### Why the two panels look different (paper-style reasoning)
+
+The manuscript’s **Gowers-type grid norms** (e.g. \((2,k)\)-grid / box-type uniformity) are designed to detect **multilinear structure** in a set \(A \subseteq [n]^2\). Your figure is only a **pixel picture** of support, but it matches the *direction* of that theory:
+
+- **Left (random):** Let \(\alpha = |A|/n^2\) and consider the balanced indicator \(f = \mathbf{1}_A - \alpha\). For a genuinely random (Bernoulli) set at density \(\alpha\), **local averages along rectangles and along lines fluctuate like noise**—there is no organized “clumpiness” for a **density increment** step to lock onto. In a cartoon of **order-2 grid / box control**, one expects \(\|f\|_{\mathrm{grid}}\) to stay **small** (on the order of \(\alpha^2\) in a coarse heuristic).
+
+- **Right (paper lift):** Membership is \((x,y) \in A \iff x+2y \in S\). Every point lies on one of the **affine lines** \(x+2y = t\). Even when \(S\) is sparse in \(\mathbb{Z}\), the lift **concentrates** \(A\) on a **family of parallel lines in the plane**—visible as **stripes / ridges** in the heatmap. That **anisotropic alignment** is exactly the kind of **non-pseudorandom** pattern a **grid norm** is meant to **amplify**: heuristically \(\|f\|_{\mathrm{grid}}\) is **large** (well above the \(\alpha^2\) “random baseline”), signaling **hidden linear structure** compatible with the proof’s **relative sifting** / **density increment** engine (see [arXiv:2504.07006](https://arxiv.org/abs/2504.07006)).
+
+*Caveat:* this repo does **not** compute a numerical grid norm—only the **occupancy** heatmap—so treat the table below as an **interpretive bridge** to the paper, not measured output.
+
+### Relative / quasirandom “sifting” trade-off (interpretive)
+
+| Metric | Random Bernoulli | Paper-aligned lift | Paper context |
+|--------|------------------|--------------------|----------------|
+| Grid / box-type norm (order-2 cartoon) | Very low (\(\approx \alpha^2\) scale) | High (\(\gg \alpha^2\) heuristically) | **Signal** that multilinear averages see structure |
+| Sifting / increment step | No meaningful dense sub-rectangle | Dense structure along **line families** \(x+2y=t\) | Where a **density increment** can **latch** |
+| NOF / “Exactly-\(N\)” viewpoint (Project 1) | Near-uniform local views | Correlated local views under lift | Corners \(\leftrightarrow\) **Exactly-\(N\)**-type obstructions (informal) |
+
+### Suggested logic flow (for a written report)
+
+1. **Random baseline (Von Neumann–type picture):** In a **random** dense set, corner counts are governed by **first-moment / independence** heuristics (schematically \(\alpha^3\) at density \(\alpha\) in the random model). There is **no** structured obstruction for a multilinear form to exploit—matching the **flat** left panel.
+
+2. **Density increment observation:** The **paper lift** panel is **not** pseudorandom along rectangles: mass **aligns** with **\(x+2y\)**. Use the heatmap as **visual evidence** that your construction is in the **structured** regime the paper’s norms are built to detect.
+
+3. **“Diagonal vs sides” (optional narrative hook):** In proof sketches, one often keeps a **diagonal** (or a structured fiber) **dense** while forcing **spread** in complementary coordinates—avoiding **tower-type** bookkeeping in communication or counting. If you use NOF material (Project 1), you can analogize: **local views stay informative** without paying an exponential **round** cost. (Phrase this to match the exact lemma you cite from your PDF.)
+
+### Follow-up (non-abelian lifts)
+
+> **Question:** How does the **grid-norm / uniformity** picture change if the lift is taken over a **non-abelian** group instead of \(\mathbb{Z}_N\)?
+
+The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abelian** quasipolynomial-type bounds can be **exported** to **all finite groups**—a natural place to start if you extend this codebase beyond \(\mathbb{Z}\).
+
 ---
 
 ## Summary table (README ↔ paper story)
@@ -135,7 +179,7 @@ If your **Project 1** code uses a Number-on-Forehead (NOF) model (players see al
 | Diagram | 1D 3-AP \(\{z,z+d,z+2d\}\) vs 2D corner | projection / lift \(x+2y\) |
 | Line chart | decay / density vs \(N\) | quasipolynomial-type bounds vs weak bounds |
 | Logic map | Alice / Bob / Charlie NOF views | multi-party NOF / “Exactly-\(N\)” viewpoint (Project 1) |
-| Heat map | random vs Behrend lift occupancy | “clumpiness” / structured majorants (illustrative) |
+| Heat map | random vs paper lift occupancy | anisotropy / **grid-norm** cartoon (structured vs pseudorandom) |
 
 ---
 
