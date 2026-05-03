@@ -6,6 +6,8 @@ This document describes the JSON (and optional CSV) format produced by `research
 
 **CLI:** `python behrend_corner_free.py ... --export-grid-norm-json out.json` and/or `--export-grid-norm-csv out.csv`
 
+**Batch / validation:** [`scripts/paper_compliance_loop.py`](../scripts/paper_compliance_loop.py) writes `grid_norm_pipe_export.json` plus a **Paper Compliance Report** (Markdown + JSON) and can forward the same file to an external detector via `--detector-cmd '... {json_path} ...'`.
+
 ---
 
 ## Versioning

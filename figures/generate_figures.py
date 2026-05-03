@@ -95,6 +95,75 @@ def write_density_svg(path: str, w: int = 800, h: int = 480) -> None:
         f.write("\n".join(parts))
 
 
+def write_quantitative_saving_arc_svg(path: str, w: int = 820, h: int = 420) -> None:
+    """
+    Schematic "quantitative arc": three *illustrative* density-savings shapes vs log N.
+    Not literal theorem constants—pedagogical comparison for talks (see figure disclaimer).
+    """
+    pad_l, pad_r, pad_t, pad_b = 78, 160, 45, 52
+    iw, ih = w - pad_l - pad_r, h - pad_t - pad_b
+
+    def x_pix(log_n: float) -> float:
+        lo, hi = math.log(20), math.log(2e6)
+        t = (log_n - lo) / (hi - lo)
+        return pad_l + max(0.0, min(1.0, t)) * iw
+
+    def y_pix(v: float) -> float:
+        return pad_t + (1.0 - max(0.0, min(1.0, v))) * ih
+
+    Ns = [20 * (2e6 / 20) ** (i / 199) for i in range(200)]
+    shk: list[float] = []
+    jab: list[float] = []
+    beh: list[float] = []
+    for N in Ns:
+        log_n = math.log(max(N, math.e))
+        shk.append(1.0 / math.log(max(math.log(N), 2.0)))
+        jab.append(math.exp(-(log_n**0.38)))
+        beh.append(math.exp(-math.sqrt(log_n)))
+
+    def norm(xs: list[float]) -> list[float]:
+        lo, hi = min(xs), max(xs)
+        if hi <= lo:
+            return [0.5] * len(xs)
+        return [(v - lo) / (hi - lo) for v in xs]
+
+    s1, s2, s3 = norm(shk), norm(jab), norm(beh)
+    p1 = [(x_pix(math.log(N)), y_pix(v)) for N, v in zip(Ns, s1)]
+    p2 = [(x_pix(math.log(N)), y_pix(v)) for N, v in zip(Ns, s2)]
+    p3 = [(x_pix(math.log(N)), y_pix(v)) for N, v in zip(Ns, s3)]
+
+    def polyline_pts(pts: list[tuple[float, float]]) -> str:
+        return " ".join(f"{px:.1f},{py:.1f}" for px, py in pts)
+
+    tex_log = r"$\log N$"
+    tex_sim_ll = r"$\sim 1/\log\log N$"
+    tex_jab = r"$\exp(-(\log N)^{0.38})$"
+    tex_beh = r"$\exp(-\sqrt{\log N})$"
+
+    parts = [
+        _svg_header(w, h),
+        '<rect width="100%" height="100%" fill="#fafafa"/>',
+        f'<text x="{(pad_l + w - pad_r)//2}" y="26" text-anchor="middle" font-size="15" fill="#222">'
+        f"Quantitative arc (schematic): savings / density scales vs {tex_log}</text>",
+        f'<text x="{(pad_l + w - pad_r)//2}" y="44" text-anchor="middle" font-size="10" fill="#666">'
+        "Illustrative normalization only — not literal constants from any single theorem</text>",
+        f'<polyline fill="none" stroke="#888" stroke-width="2.2" points="{polyline_pts(p1)}"/>',
+        f'<polyline fill="none" stroke="#b9770e" stroke-width="2.2" points="{polyline_pts(p2)}"/>',
+        f'<polyline fill="none" stroke="#1a5276" stroke-width="2.2" points="{polyline_pts(p3)}"/>',
+        f'<text x="{pad_l}" y="{h-22}" font-size="11" fill="#555">Horizontal: {tex_log}</text>',
+        f'<text x="{pad_l}" y="{h-8}" font-size="10" fill="#888">Vertical: min–max normalized curves for readability</text>',
+        f'<text x="{w - pad_r + 8}" y="{pad_t + 22}" font-size="11" fill="#888">Shkredov-type scale</text>',
+        f'<text x="{w - pad_r + 8}" y="{pad_t + 40}" font-size="11" fill="#b9770e">Jaber et al. (2025) regime</text>',
+        f'<text x="{w - pad_r + 8}" y="{pad_t + 58}" font-size="11" fill="#1a5276">Behrend lower-bound scale</text>',
+        f'<text x="{w - pad_r + 8}" y="{pad_t + 76}" font-size="9" fill="#999">{tex_sim_ll}</text>',
+        f'<text x="{w - pad_r + 8}" y="{pad_t + 90}" font-size="9" fill="#999">{tex_jab}</text>',
+        f'<text x="{w - pad_r + 8}" y="{pad_t + 104}" font-size="9" fill="#999">{tex_beh}</text>',
+        "</svg>",
+    ]
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
 def _downsample_grid(
     points: set[tuple[int, int]], n_src: int, n_dst: int
 ) -> list[list[float]]:
@@ -382,6 +451,7 @@ def main() -> None:
         ("nof_sketch.svg", write_nof_sketch_svg),
         ("shell_density_profile.svg", write_shell_profile_svg),
         ("skew_vs_axis_corner.svg", write_skew_vs_axis_corner_svg),
+        ("quantitative_saving_arc.svg", write_quantitative_saving_arc_svg),
     ]
     for name, fn in paths:
         p = os.path.join(out_dir, name)

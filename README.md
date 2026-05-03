@@ -8,6 +8,7 @@
 | [Quick start](#quick-start) | Commands: CLI, tests, figures |
 | [Research extensions](#research-extensions-benchmark-style) | Skew search + **constructions**, shell profile, **grid_norm** pipe, $S_n$ demo |
 | [Docs (math + schema)](#supplementary-documents) | Skew-free lemmas, `grid_norm_pipe_v1` spec |
+| [Capstone](#capstone-validation-loop-quantitative-arc-diagonal-drop) | Compliance loop, saving arc, diagonal drop |
 | [Gallery & proofs](#visual-gallery-inline) | Figures, where formal proofs live |
 | [Alignment with the paper](#alignment-with-the-paper-jaber-et-al-2025) | Curvature, sifting, Behrend regime, NOF |
 | [§1–4](#1-geometry-of-the-lift-projection-equivalence) | Lift, density, NOF, heatmaps |
@@ -17,7 +18,7 @@
 
 ## Overview
 
-**Corner-Free Set Generator** is a Python **research demo** for Behrend-type **digit-shell** sets $S$ (fixed $\sum_i x_i^2$ in base $d$), an optional **3-AP-free** shell choice, and the paper-style **lift** $A = \{(x,y) \in [n]^2 : x+2y \in S\}$. It **checks for axis corners** and contrasts the lift with a **digit-split** embedding. Optional **research tooling** ([below](#research-extensions-benchmark-style)): **skew-corner** search and **skew-free** benchmark constructions, **shell-density** tables/SVGs, **JSON/CSV** and **`grid_norm_pipe_v1`** export for grid-norm detectors, and a minimal **cyclic lift into $S_n$**. Companion to [Jaber et al., arXiv:2504.07006](https://arxiv.org/abs/2504.07006)—see [Formal proofs](#formal-proofs-where-they-live). **Stdlib-only** SVGs.
+**Corner-Free Set Generator** is a Python **research demo** for Behrend-type **digit-shell** sets $S$ (fixed $\sum_i x_i^2$ in base $d$), an optional **3-AP-free** shell choice, and the paper-style **lift** $A = \{(x,y) \in [n]^2 : x+2y \in S\}$. It **checks for axis corners** and contrasts the lift with a **digit-split** embedding. Optional **research tooling** ([below](#research-extensions-benchmark-style); **[capstone](#capstone-validation-loop-quantitative-arc-diagonal-drop)**): **skew-corner** search and **skew-free** benchmark constructions ([`docs/skew_corner_free_constructions.md`](docs/skew_corner_free_constructions.md)), **shell-density** tables/SVGs, **JSON/CSV** and **`grid_norm_pipe_v1`** export for grid-norm detectors, the **[paper compliance loop](#capstone-validation-loop-quantitative-arc-diagonal-drop)** script, and a minimal **cyclic lift into $S_n$**. Companion to [Jaber et al., arXiv:2504.07006](https://arxiv.org/abs/2504.07006)—see [Formal proofs](#formal-proofs-where-they-live). **Stdlib-only** SVGs.
 
 ---
 
@@ -56,6 +57,9 @@ python behrend_corner_free.py --skew-free greedy --skew-free-m 20 --export-grid-
 # Behrend lift: same points in both legacy and grid-norm schema
 python behrend_corner_free.py --mode paper --d 5 --k 4 --S 8 --grid-n 30 \
   --export-grid-norm-json behrend_as_grid_norm.json
+
+# Paper compliance loop: lift near target α → grid_norm JSON → optional detector → report
+python scripts/paper_compliance_loop.py --target-alpha 0.02 --write-dir reports/demo1
 ```
 
 **Useful flags:** `--d`, `--k`, `--S`, `--grid-n`, `--dense-shell` (paper mode: max shell even if 3-AP), `--list`, `--demo`. Research: `--skew-check`, `--profile-shells-csv`, `--profile-shells-svg`, `--export-json`, `--export-csv`, `--export-grid-norm-json`, `--export-grid-norm-csv`, `--symmetric-lift-json`, `--symmetric-n`, `--skew-free` / `--skew-free-m` / `--skew-free-seed`.
@@ -84,6 +88,44 @@ These bridge **lower-bound-style constructions** (Behrend shell + lift) toward *
 |----------|---------|
 | [docs/skew_corner_free_constructions.md](docs/skew_corner_free_constructions.md) | Definitions, lemmas (permutation graph), greedy caveats, CLI |
 | [docs/grid_norm_pipe_schema.md](docs/grid_norm_pipe_schema.md) | Full **`grid_norm_pipe_v1`** JSON/CSV field reference for tooling |
+| [docs/diagonal_drop.md](docs/diagonal_drop.md) | §7.1-style **diagonal vs coordinate** narrative (for Grid Norm / Exactly-$N$ repos) |
+
+---
+
+## Capstone: validation loop, quantitative arc, diagonal drop
+
+### 1. “Standard model” verification loop
+
+Script **[`scripts/paper_compliance_loop.py`](scripts/paper_compliance_loop.py)** ties together:
+
+1. **Behrend paper lift** — search an AP-free shell whose $|A|/n^2$ is closest to a **target density** $\alpha$ (`search_ap_free_lift_near_density` in [`research_extensions.py`](research_extensions.py)), or pass **`--no-search --d --k`** for fixed parameters.
+2. **Grid Norm pipe** — writes `grid_norm_pipe_export.json` (`grid_norm_pipe_v1`) into your output directory.
+3. **External detector (optional)** — `--detector-cmd 'your_tool --json {json_path}'` forwards that file to your **Grid Norm / clumpiness** CLI; stdout is JSON-parsed when possible.
+4. **Paper Compliance Report** — `paper_compliance_report.md` + `.json` with axis-corner check, AP-in-shell check, and an informal **row clumpiness proxy** (max/mean occupancy per $y$).
+
+```bash
+python scripts/paper_compliance_loop.py --target-alpha 0.025 --write-dir reports/demo
+python scripts/paper_compliance_loop.py --no-search --d 7 --k 5 --write-dir reports/fixed \\
+    --detector-cmd "python path/to/grid_norm_cli.py --input {json_path}"
+```
+
+If your detector reports **structured** behavior on the Behrend lift while `has_corner_in_grid` stays false in your checker, you have aligned **lower-bound geometry** with **upper-bound–style uniformity detection** on the same exported grid—exactly the ecosystem the two repos are meant to stress-test.
+
+### 2. Quantitative “saving” arc (professor-facing figure)
+
+The schematic **[`figures/quantitative_saving_arc.svg`](figures/quantitative_saving_arc.svg)** (regenerated with other figures) overlays three **illustrative** scales vs $\log N$:
+
+| Curve | Stylized meaning |
+|-------|------------------|
+| **Shkredov-type** | $\sim 1/\log\log N$ weakness (normalized for plot) |
+| **Jaber et al. (2025)** | $\exp(-(\log N)^{c})$-type **quasipolynomial** regime |
+| **Behrend** | $\exp(-\Theta(\sqrt{\log N}))$ lower-bound benchmark |
+
+The caption stresses **min–max normalization for readability**, not a single theorem’s constants. It is the “money shot” for showing **narrowing** between classical constructions and modern upper bounds (also inlined in the [gallery](#visual-gallery-inline)).
+
+### 3. Diagonal drop (paper §7.1)
+
+**[`docs/diagonal_drop.md`](docs/diagonal_drop.md)** explains why treating the **diagonal direction $D$** separately from **$X$** and **$Y$** avoids tower-type losses—so your **protocol / Bohr-dimension** slides can cite **Definition 6.3** and §7.1 with the same language as the paper. Copy or link this section into your **Grid Norm** or **Exactly-$N$** repo README if those tools rely on asymmetric density.
 
 ---
 
@@ -97,7 +139,11 @@ These bridge **lower-bound-style constructions** (Behrend shell + lift) toward *
 |:---:|:---:|
 | ![Shell density](figures/shell_density_profile.svg) | ![Skew vs axis](figures/skew_vs_axis_corner.svg) |
 
-Regenerate: `python figures/generate_figures.py` (writes **six** SVGs, including shell density for $d{=}5,k{=}4$ and a **skew vs axis** $\mathsf{L}$-pattern diagram).
+| Quantitative saving arc (schematic $\delta$ scales) |
+|:---:|
+| ![Quantitative arc](figures/quantitative_saving_arc.svg) |
+
+Regenerate: `python figures/generate_figures.py` (writes **seven** SVGs: density, heatmaps, lift, NOF, shell histogram, skew vs axis, **quantitative saving arc**).
 
 ## Formal proofs (where they live)
 
@@ -278,6 +324,7 @@ The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abe
 | Heat map | random vs paper lift occupancy | anisotropy / **grid-norm** cartoon (structured vs pseudorandom) |
 | Bar histogram | shell occupancy vs $\sum_i x_i^2 = S$ | density-increment / “clumping” on spheres |
 | Side-by-side grids | equal-leg vs unequal-leg $\mathsf{L}$ | skew vs axis corner (§2.2 narrative) |
+| Triple curve | Shkredov vs Jaber vs Behrend scales | quantitative **saving arc** (schematic) |
 
 ---
 
@@ -286,10 +333,12 @@ The paper’s opening (e.g. **Section 1.1** in many editions) explains why **abe
 | File | Purpose |
 |------|---------|
 | `behrend_corner_free.py` | Sphere shell, `paper_lift_from_set`, AP-free shell picker, corner checks, CLI |
-| `figures/generate_figures.py` | Six SVGs: density, heatmaps, lift schematic, NOF sketch, shell-density histogram, **skew vs axis** diagram |
+| `scripts/paper_compliance_loop.py` | Master validation: lift → `grid_norm_pipe` export → optional detector → compliance report |
+| `figures/generate_figures.py` | Seven SVGs: density, heatmaps, lift, NOF, shell histogram, skew vs axis, **quantitative arc** |
 | `research_extensions.py` | Skew search + skew-free constructors, shell CSV/SVG, `grid_norm_pipe_v1`, legacy export, cyclic $S_n$ lift |
 | `docs/skew_corner_free_constructions.md` | Lemmas and CLI notes for skew-free modes |
 | `docs/grid_norm_pipe_schema.md` | **`grid_norm_pipe_v1`** JSON/CSV specification |
+| `docs/diagonal_drop.md` | Diagonal vs coordinate directions (§7.1 reader’s guide) |
 | `tests/test_behrend_corner_free.py` | `unittest` suite (sphere slice, AP detection, paper lift vs digit-split) |
 | `tests/test_research_extensions.py` | Skew constructions, grid-norm JSON, shell counts, cyclic $S_n$ |
 | `scripts/format_readme_math.py` | Optional: normalize TeX delimiters in `README.md` |

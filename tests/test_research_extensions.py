@@ -54,6 +54,23 @@ class TestSkewFreeConstruct(unittest.TestCase):
         self.assertTrue(rex.is_skew_corner_free(p))
 
 
+class TestLiftDensitySearch(unittest.TestCase):
+    def test_search_returns_valid_lift(self) -> None:
+        d, k, _sq, pl, alpha = rex.search_ap_free_lift_near_density(
+            0.04,
+            max_d=8,
+            max_k=4,
+            max_universe=12_000,
+        )
+        self.assertEqual(pl.d, d)
+        self.assertEqual(pl.k, k)
+        self.assertGreater(alpha, 0.0)
+        self.assertLess(alpha, 1.0)
+
+    def test_row_proxy_on_uniform_singleton(self) -> None:
+        self.assertAlmostEqual(rex.clumpiness_proxy_row_ratio({(1, 1)}, 5), 5.0)
+
+
 class TestGridNormPipe(unittest.TestCase):
     def test_json_schema_fields(self) -> None:
         pts = {(1, 2), (3, 1)}

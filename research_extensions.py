@@ -4,7 +4,9 @@ profiling, **grid_norm_pipe_v1** export for external norm tooling, and a minimal
 (cyclic subgroup of S_n) lift — companion to arXiv:2504.07006-style discussion.
 
 This module does not prove new bounds; it instruments constructions for experiments. See
-``docs/skew_corner_free_constructions.md`` and ``docs/grid_norm_pipe_schema.md``.
+``docs/skew_corner_free_constructions.md`` and ``docs/grid_norm_pipe_schema.md``. Functions
+``search_ap_free_lift_near_density`` and ``clumpiness_proxy_row_ratio`` support
+``scripts/paper_compliance_loop.py``.
 """
 
 from __future__ import annotations
@@ -12,6 +14,7 @@ from __future__ import annotations
 import csv
 import json
 import random
+from collections import Counter
 from typing import Iterable, Iterator, List, Optional, Sequence, Set, Tuple
 
 import behrend_corner_free as b
@@ -97,6 +100,55 @@ def construct_skew_corner_free_greedy(m: int, rng: random.Random) -> Set[Coord]:
         if find_skew_corner(trial) is None:
             out.add(c)
     return out
+
+
+def clumpiness_proxy_row_ratio(points: Set[Coord], grid_n: int) -> float:
+    """
+    Informal diagnostic: max over rows of (occupancy) divided by mean occupancy |P|/n.
+    Behrend paper lifts concentrate on lines x+2y = const → mass on sparse rows → ratio ≫ 1.
+    Not a Gowers norm; use your detector JSON pipe for quantitative uniformity.
+    """
+    if not points or grid_n < 1:
+        return 1.0
+    by_y = Counter(y for _x, y in points)
+    mean = len(points) / grid_n
+    if mean <= 0:
+        return 1.0
+    return max(by_y.values()) / mean
+
+
+def search_ap_free_lift_near_density(
+    alpha_target: float,
+    *,
+    max_d: int = 14,
+    max_k: int = 7,
+    max_universe: int = 800_000,
+) -> Tuple[int, int, int, b.PaperLiftGrid, float]:
+    """
+    Search AP-free sphere shells and paper lifts for (d,k) with d^k ≤ max_universe, minimizing
+    | |A|/n^2 − alpha_target | over the default lift grid side.
+
+    Used by ``scripts/paper_compliance_loop.py`` for benchmark targeting (not an inverse theorem).
+    """
+    if not (0.0 < alpha_target < 1.0):
+        raise ValueError("alpha_target must lie in (0,1)")
+    best_err = float("inf")
+    best: Optional[Tuple[int, int, int, b.PaperLiftGrid, float]] = None
+    for d in range(3, max_d + 1):
+        for k in range(3, max_k + 1):
+            max_x = d**k - 1
+            if max_x > max_universe:
+                continue
+            sum_sq, _ = b.best_S_ap_free_max_count(d, k, max_x=max_x)
+            pl = b.build_paper_lift_grid(d, k, sum_sq, grid_n=None, max_x=max_x)
+            alpha = pl.size / (pl.grid_n * pl.grid_n)
+            err = abs(alpha - alpha_target)
+            if err < best_err:
+                best_err = err
+                best = (d, k, sum_sq, pl, alpha)
+    if best is None:
+        raise RuntimeError("no (d,k) found; widen max_d/max_k or raise max_universe")
+    return best
 
 
 def iter_shell_counts(
